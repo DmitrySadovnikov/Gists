@@ -1,0 +1,56 @@
+crossbow {
+    display:        flex;
+    flex-direction: row-reverse;
+}
+
+crossbow {
+    display:         flex;
+    flex-direction:  column-reverse;
+    justify-content: flex-start; /* передвигает box в начало (default)*/
+    justify-content: flex-end; /* передвигает box в конец*/
+    justify-content: center;
+    justify-content: flex-center;
+    justify-content: space-between; /* промежутки между боксами*/
+    justify-content: space-around;
+
+}
+
+crossbow {
+    display:     flex;
+    align-items: flex-start; /* распределение боксов с начало до конца блока по очереди */
+    align-items: flex-end;
+    align-items: stretch; /* вытягивает боксы по высоте блока в котором они находятся*/
+    align-items: center;
+}
+
+.target:nth-of-type(2) {
+    align-self: flex-start;
+    align-self: stretch; /* растягивает только один бокс*/
+    align-self: center;
+    align-self: flex-end;
+}
+
+.target.goo {
+    flex-grow: 1; /* расширение текущего бокса до 1*/
+}
+
+.target.goo {
+    flex-shrink: 1; /* ужимает бокс если в блоке недостаточно места*/
+}
+
+.target.goo {
+    flex-basis: 300px; /* дефолтное значение для бокса*/
+}
+
+.target.male {
+    order: 2; /* меняет порядок боксов*/
+}
+
+crossbow {
+    display:       flex;
+    align-items:   center;
+    flex-wrap:     wrap; /* не сжимает боксы в мобильной версии, а перекидывает их на следующую строку*/
+    flex-wrap:     wrap-reverse;
+    align-content: stretch; /* растягивает контент внутри бокса*/
+}
+

@@ -1,0 +1,29 @@
+docker ps -a 											# list all containers
+docker container run httpd:2.4
+docker container run -p 80:80 httpd:2.4					# run on port 80 - default port for web, -p - publish
+docker container run -p 9999:80 httpd:2.4				# run on port 9999
+docker container ls										# list of container
+docker container exec elegant_noether du -mh			# run container with command du -mh (disk usage)
+docker container exec -it elegant_noether /bin/bash		# -i and -t flags to keep an interactive shell open
+
+docker inspect 23sdf324                                 # setting of container
+
+PATH=$PATH:/usr/games/									# set env var
+export PATH
+
+
+#### Dockerfile ####
+FROM httpd:2.4                                          # a base image name
+EXPOSE 80                                               # port into container
+RUN apt-get update                                      # install soft
+RUN apt-get install -y fortunes
+RUN apt-get update && apt-get install -y fortunes
+COPY page.html /usr/local/apache2/htdocs/               # copy file to container
+LABEL maintainer="moby-dock@example.com"                # contact information
+####################
+
+
+docker image build --tag web-server:1.0 .               # build container              
+docker container cp page.html elegant_noether:/usr/local/apache2/htdocs/ # copy to docker
+docker container run -p 80:80 --detach web-server:1.1. # detach - run in the background # to create a link between the folder /my-files on your host machine and the htdocs folder in the container. This also gives the container a custom name of my-web and runs it in the background.
+docker container exec -it my-web /bin/bash

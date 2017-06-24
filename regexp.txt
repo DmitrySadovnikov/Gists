@@ -1,0 +1,118 @@
+//modifiers//
+
+'/.../i' // case insensitive (ignore case)
+'/.../g' // global (find all matchers)
+'/.../m' // multiline (like \n)
+
+/////////////
+
+
+//or
+'/407|321/'
+
+'/ar+/' //arrrr but arrt not fit
+
+'/[a-z]/' //one char from range from a to z
+'/[A-Z]/' //one char from range from A to Z
+
+'/[a-zA-Z]+' // all letters
+//or
+'[a-z]+/i' // i - case insensitive
+
+String s = 'Captain hook'
+'/Captain\shook/'
+//or
+'[a-z\s]+/i'
+
+
+'/\w/' = '/[a-zA-Z0-9]'
+'/\d/' = '/[0-9]/' // only digits
+'/\s/'      // space, tab and new line
+'/\./'      // only dots
+'/["cmf"]/' // only words than contains c m f
+
+'/./'       // all chars except newline
+'/\./'      // only dots
+'/+/'       // matches 1 or more times
+'/\+/'      // only plus
+
+^ // starts with
+$ // stop 
+
+'/^[0-9]{2}$/' //only two digits
+
+'/^learnbydoing$/' // only learnbydoing
+// or
+'/^w\+@\w+\.(com|net|org|edu)$/i'
+
+
+
+
+'/\bOK\b/' //only OK word
+'/\bOK\b|\bOKAY\b/' //only OK or OKAY words
+'/\bOK(AY)\b/' //only OK or OKAY words 
+
+'/ship?/' // p 0 or 1 time
+'/pirate\s(ship)?/' //'pirate ship' and 'pirate boat' are true
+'/ok(ay)?/' // 'ok' and 'okay' are true
+'/\b(ok(ay)?|sure)\b/' // 'ok', 'okay' and 'sure' are true
+
+
+
+
+
+'/[^\d]+/' // anything is not a number
+
+'/[^\d]/'
+//or
+'/\D/' //is not a number
+
+'/[^\s]/'
+//or
+'/\S/' //is not a white space
+
+'/[^\w]/'
+//or
+'/\W/' //is not a word
+
+
+
+
+'/[a-z]{2}/'   // TEst           - only two characters
+'/[a-z]{1,3}/' // Test TEst TESt - only one two or three characters
+'/[a-z]{20,}/' // minimum 20 and maximum is infinity
+'/[a-z]*/'     // from 0 to infinity
+
+
+
+
+
+//examples//
+
+
+'/^-?\d{1,3}\.\d+$/gm'
+//56.343
+//-34.4545
+//454.3434
+
+
+
+
+
+'/(^\d{2}\/\d{2}\/(?:2015|2016) (\d{2}:\d{2}))$/' // 2015|2016 not in match group
+// match groups:
+// 02/05/2016 05:51
+// 05:51
+
+'/((?:sword|flat|blow)fish)/mg/' // (?:sword|flat|blow) not in match group
+// swordfish
+// flatfish
+// blowfish
+
+
+
+
+"[^'\\p{L}\\p{Nd}]+"  //- remove all except letters and digits and '
+"[^\\p{L}]+" //- remove all except letters
+
+////////////

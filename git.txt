@@ -1,0 +1,107 @@
+git diff filename //difference in file
+git show HEAD //show last commit changes
+git checkout HEAD filename //restore last changes
+git reset HEAD filename //reset last changes
+git reset SHA //rewind to specific commit
+
+
+***BRANCHES***
+git branch //show current branch
+git branch new_branch
+git checkout branch_name // select branch
+git branch -d branch_name// delete branch from project
+**************
+
+***Git Teamwork***
+git clone remote_location clone_name //clone and rename folder
+git fetch //for syncronize local and remote repos (cloning all branches) without merge
+git merge origin/master
+git branch <branch_name> // create new branch
+git checkout <branch_name> //switch the branch
+git push origin your_branch_name
+******************
+
+git clone https://github.com/Money-control/maoneymanagerrep.git -b sadedvBranch
+git fetch && git checkout sadedvBranch
+git remote -v
+git push origin master
+
+
+Git clone specific commit
+###########
+# make a new blank repository in the current directory
+git init
+
+# add a remote
+git remote add origin url://to/source/repository
+
+# fetch a commit (or branch or tag) of interest
+# Note: the full history of this commit will be retrieved
+git fetch origin <sha1-of-commit-of-interest>
+
+# reset this repository's master branch to the commit of interest
+git reset --hard FETCH_HEAD
+
+###########
+
+
+####
+git commit [some files]
+
+git add [some files] 
+git add [some more files]
+git commit 
+
+
+git stash                    # remove all changes from HEAD and save them somewhere else
+git checkout <other-project> # change branches
+git cherry-pick <commit-id>  # pick a commit from ANY branch and apply it to the current
+git checkout <first-project> # change to the other branch
+git stash pop                # restore all changes again
+####
+
+###### HEAD перемещения ######
+git checkout <sha> # Move head to specific commit
+git HEAD^  # Move head to 1 commit back
+git HEAD^2 # Move head to 2 commit back
+git HEAD~2 # Move head to 2 commits back
+git checkout master^ # Move to parrento of last master's commit
+
+git branch -f master HEAD~3 # Переместит (принудительно) ветку master на три родителя назад от HEAD.
+git branch -f master <sha>  # Переместит (принудительно) ветку master на определенный коммит.
+
+
+##############################
+
+###### Отмена изменений ######
+git reset HEAD~1 # перенесёт ветку назад, как будто некоторых коммитов вовсе и не было
+git revert HEAD  # появился новый коммит, новый коммит C2' содержит изменения противоположные C2.
+##############################
+
+######## Cherry-pick #########
+git cherry-pick <Commit1> <Commit2> #копировать несколько коммитов на место, где сейчас HEAD
+##############################
+
+########## rebase ############
+git rebase bran1 bran2 #bran1 станет родителем bran2
+
+git rebase -i HEAD~4 # Можно менять местами последние 4 коммита
+        # pick   - пропускает коммит (удаляет)
+        # squash - объединяет коммиты
+
+        # edit f7f3f6d changed my name a bit
+        # pick 310154e updated README formatting and added blame
+        # pick a5f4a0d added cat-file
+        # squash a5f4a0d added cat-file
+        # squash 310154e updated README formatting and added blame
+
+git pull --rebase
+##############################
+
+########### tags #############
+
+git tag vers1 <sha>
+git describe <ref>
+
+
+##############################

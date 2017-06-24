@@ -1,0 +1,177 @@
+//// Basic  ////
+// Data Types
+$a-number: 2;              // Numbers
+$a-string: 'one' + ' two'; // Strings
+$i-am-true: true;          // Booleans
+null
+Lists
+Maps
+///
+
+// Colors
+$color: yellowgreen;             // #9ACD32
+color:  lighten($color, 15%);    // #b8dc70
+color:  darken($color, 15%);     // #6c9023
+color:  saturate($color, 15%);   // #a1e01f
+color:  desaturate($color, 15%); // #93ba45
+color:  (green + red);           // #ff8000
+///
+
+// Lists
+$font-list: 'Raleway','Dosis','Lato'; // Three comma separated elements
+$pad-list: 10px 8px 12px;             // Three space separated elements
+$multi-list: 'Roboto',15px 1.3em;     // This multi-list has two lists.
+///
+
+// Maps
+$styling: (
+  'font-family': 'Lato',
+  'font-size':   1.5em,
+  'color':       tomato,
+  'background':  black
+);
+
+h1 {
+  color:      map-get($styling, 'color');
+  background: map-get($styling, 'background');
+}
+///
+
+// Переменные
+@import url(https://fonts.googleapis.com/css?family=Pacifico);
+@import "helper/mixins";
+$translucent-white:  rgba(255,255,255,0.3);
+$icon-square-length: 300px;
+$standard-border:    4px solid black;
+///
+
+// Nesting
+.parent {
+  font : {
+    family: Roboto, sans-serif;
+    size: 12px;
+    decoration: none;
+  }
+}
+///
+border : {
+    top:    4px solid black;
+    bottom: 4px solid black;
+}
+///
+
+// Inheritance
+.absolute { position: absolute; }
+span { @extend .absolute; }
+///
+
+// Placeholder от него можно только наследоваться, сам по себе он не рендерится в css
+a%drink { background-color: $lemon-yellow; }
+.lemonade { @extend %drink; }
+// очень похож на mixin
+%center {
+  text-align: center;
+  vertical-align: middle;
+}
+h1 { @extend %center;}
+///
+
+////////////
+
+
+
+/// Mixins and Selectors
+@mixin transform-style($style){
+  transform-style:         $style;
+  -moz-transform-style:    $style;
+  -o-transform-style:      $style;
+  -ms-transform-style:     $style;
+  -webkit-transform-style: $style;
+}
+.klass {
+  @include transform-style(preserve-3d);
+}
+///
+@mixin hover-color($color) {
+   &:hover { color: $color; }
+}
+///
+// default value
+@mixin backface-visibility($visibility: hidden) {
+  // Backface properties
+}
+///
+// properties
+$stripe-properties: to bottom, 15%, blue, white;
+@mixin stripes($direction, $width-percent, $stripe-color, $stripe-background: #FFF) {}
+.definition { @include stripes($stripe-properties...); }
+///
+//string interpolation
+@mixin photo-content($file) { content: url(#{$file}.jpg); }
+.photo { @include photo-content('titanosaur'); }
+////////////
+
+
+
+//// Functions and operators ////
+$width: 250px;
+$lagoon-blue: fade-out(#62fdca, 0.5); // снизить прозрачность на 50%
+
+.math {
+  height: $width/6;
+  line-height: $width/6;
+  border-radius: $width/30;
+  text-align: center;
+  background-color: $lagoon-blue;
+
+  // сложение цветов
+  $color: #010203 + #040506; // # 050709
+  // 01 + 04 = 05
+  // 02 + 05 = 07
+  // 03 + 06 = 09
+
+  font-size: $width/6/2; // делим два раза
+}
+//////
+
+// loops
+$list: (orange, purple, teal);
+@each $item in $list {
+  .#{$item} {
+    background: $item;
+  }
+}
+///
+$total: 10; //Number of .ray divs in our html
+$step: 360deg / $total; //Used to compute the hue based on color-wheel
+.ray {
+  height: 30px;
+}
+@for $i from 1 through $total {
+  .ray:nth-child(#{$i}) {
+    background: adjust-hue(blue, $i * $step);
+    width: if($i % 2 == 0, 300px, 350px);
+    margin-left: if($i % 2 == 0, 0px, 50px);
+   }
+}
+//////
+
+// if statement
+@mixin deck($suit) {
+ @if($suit == hearts || $suit == spades){
+   color: blue;
+ }
+ @else-if($suit == clovers || $suit == diamonds){
+   color: red;
+ }
+ @else{
+   //some rule
+ }
+}
+///
+@if not $a-number {
+} @else {
+}
+///
+
+////////////
