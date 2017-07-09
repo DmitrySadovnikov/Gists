@@ -177,6 +177,7 @@ ReactDOM.render(
 // => { myProp: "Hello" }
 
 //////////
+// берем проперти из <PropsDisplayer myProp="Hello"/>
 var Greeting = React.createClass({
   render: function () {
     return <h1>Hi there, {this.props.firstName}!</h1>;
@@ -390,3 +391,222 @@ var Toggle = React.createClass({
   }
 });
 ///
+
+
+
+// PART 2
+
+
+/// stateful component class
+
+// Parent.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Child } from './Child';
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Child } from './Child';
+
+class Parent extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { name: 'Frarthur' };
+
+    this.changeName = this.changeName.bind(this); //меняет ия родителя
+  }
+
+  changeName(newName) {
+    this.setState({
+      name: newName
+    });
+  }
+
+  render() {
+    return <Child name={this.state.name} onChange={this.changeName} />
+  }
+}
+
+ReactDOM.render(
+  <Parent />,
+  document.getElementById('app')
+);
+
+
+// Child.js
+import React from 'react';
+
+export class Child extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e) {
+    const name = e.target.value;
+    this.props.onChange(name);
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>
+          Hey my name is {this.props.name}!
+        </h1>
+        <select id="great-names" onChange={this.handleChange}>
+          <option value="Frarthur">
+            Frarthur
+          </option>
+
+          <option value="Gromulus">
+            Gromulus
+          </option>
+
+          <option value="Thinkpiece">
+            Thinkpiece
+          </option>
+        </select>
+      </div>
+    );
+  }
+}
+///
+import React from 'react';
+
+export class Child extends React.Component {
+  render() {
+    return (
+      <div>
+        <select id="great-names" onChange={this.props.onChange} > //
+          <option value="Frarthur">
+            Frarthur
+          </option>
+
+          <option value="Gromulus">
+            Gromulus
+          </option>
+
+          <option value="Thinkpiece">
+            Thinkpiece
+          </option>
+        </select>
+      </div>
+    );
+  }
+}
+///////////////
+// Parent.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Child } from './Child';
+import { Sibling } from './Sibling';
+
+class Parent extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { name: 'Frarthur' };
+
+    this.changeName = this.changeName.bind(this);
+  }
+
+  changeName(newName) {
+    this.setState({
+      name: newName
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <Child
+          onChange={this.changeName} />
+        <Sibling name={this.state.name}/>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <Parent />,
+  document.getElementById('app')
+);
+
+
+// Child.js
+import React from 'react';
+
+export class Child extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e) {
+    const name = e.target.value;
+    this.props.onChange(name);
+  }
+
+  render() {
+    return (
+      <div>
+        <select
+          id="great-names"
+          onChange={this.handleChange}>
+
+          <option value="Frarthur">Frarthur</option>
+          <option value="Gromulus">Gromulus</option>
+          <option value="Thinkpiece">Thinkpiece</option>
+        </select>
+      </div>
+    );
+  }
+}
+
+
+// Siblings.js
+import React from 'react';
+
+export class Sibling extends React.Component {
+  render() {
+    let name = this.props.name;
+
+    return (
+      <div>
+        <h1>Hey, my name is {name}!</h1>
+        <h2>Don't you think {name} is the prettiest name ever?</h2>
+        <h2>Sure am glad that my parents picked {name}!</h2>
+      </div>
+    );
+  }
+}
+
+
+
+////style
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+const styleMe = <h1 style={{ background: 'lightblue', color: 'darkred' }}>Please style me! I am so bland!</h1>;
+
+ReactDOM.render(
+  styleMe,
+  document.getElementById('app')
+);
+
+//
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+const styles = {
+  marginTop:       "20px", // CamelCase
+  marginTop:       20,     // Without PX
+  backgroundColor: "green"
+};
+const styleMe = <h1 style={styles}>Please style me! I am so bland!</h1>;
+
+////

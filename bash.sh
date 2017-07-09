@@ -68,3 +68,24 @@ echo $HOME                   #shows HOME dir
 echo $PATH                   #shows PAT dirs     
 env                          #shows all env vars
 
+
+
+
+
+
+## examples
+
+# parsing url and download html
+links=(
+http://localhost:3000/contracts/11
+http://localhost:3000/contracts/63
+)
+
+for item in ${links[*]}
+do
+  echo "${item}"
+  url="${item}"
+  curl  -o "${url##*/}.html"  "${item}"
+  echo ""
+done
+###

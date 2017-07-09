@@ -2,16 +2,27 @@
 ##############################
 require 'file_name' # includes file
 include ModuleName # includes instance methods
-extend ModuleName # includes class methods
+extend  ModuleName # includes class methods
+prepend ModuleName # includes class methods above self methods
+
 Klass < ParentClass # inheritence
 
-/sera/ === "coursera" && "coursera"==="coursera" && Integer === 21 # сравнивает объект и класс
+/sera/ === 'coursera' && 'coursera' === 'coursera' && Integer === 21 # сравнивает объект и класс
 [9, 3, 4, 9, 5].count(9) # => 2
 
+##
+a =  [:foo] * 4   # => [:foo, :foo, :foo, :foo]
+a = *[:foo] * 4  # => :foo, :foo, :foo, :foo   it's split arguments
+##
 # string to ruby code
 eval('[1, 2] << 3') # => [1, 2, 3]
 
-###### wierd
+###### examples
+private
+attr_reader :payments
+###
+delegate :credit_amount, :credit_term, :base_rate, to: :borrower
+###
 def human_repayment_frequency
   {
     'week'  => 7,
@@ -35,7 +46,7 @@ BigDecimal.new('123.45678901234567890').to_s('3F') # "123.456 789 012 345 678 9"
 [1, 2, 3].inject { |res, i| res + i } # => 6
 [1, 2, 3].inject(:+) # => 6
 [true, false, true].inject(:&) == false
-[true, true, true].inject(:&) == true
+[true, true, true].inject(:&)  == true
 ###
 
 # tap - принимает на вход себя и изменяет
@@ -73,19 +84,19 @@ p # => println
 print # => print
 gets # => input text
 <=> # => comparator
-  .sample x # выводит случайные x элемента массива
-            .is_a? # => intenceOf
-            .kind_of? # => intenceOf
+.sample(x) # выводит случайные x элемента массива
+.is_a? # => intenceOf
+.kind_of? # => intenceOf
 .chomp # обрезает \n в конце
 .select # => выбирает из массива значения соотв заданным условиям
-   .collect # => it returns a new array with the same parameters
-   .collect!.map! # => methods do the exact same thing
+.collect # => it returns a new array with the same parameters
+.collect!.map! # => methods do the exact same thing
 .gsub!(/s/, "th") # => replace
-   .include? # => contains
-   .start_with?
-   .end_with?
-   .index # return index of letter in string
-   .lstrip # - удаляет пробелы
+.include? # => contains
+.start_with?
+.end_with?
+.index # return index of letter in string
+.lstrip # - удаляет пробелы
 
 # перенос строки
 'this is very' \
@@ -361,25 +372,19 @@ class Person
     @@people_count
   end
 end
-matz = Person.new("Yukihiro")
-dhh  = Person.new("David")
+matz = Person.new('Yukihiro')
+dhh  = Person.new('David')
 puts "Number of Person instances: #{Person.number_of_instances}"
 ##############################
 
 
 #default arguments
-##########
-def norm_method(arg, options = {})
-  ; p
-end
-
-##########
 def max(one_param, *numbers, &block) #numbers - это массив, в него входят все переданые
   # параметры кроме первого и последенго
   numbers.max
 end
 
-puts max("something", 7, 32, -4, "more") # ==> 32
+puts max('something', 7, 32, -4, 'more') # ==> 32
 ############################
 
 
@@ -392,11 +397,11 @@ end
 meth(1, 2) { |x, y| x + y } # => 3 + (1 + 2) = 6
 ###
 1.times do
-  puts "I'm a code block!"
+  puts 'I\'m a code block!'
 end
-1.times { puts "As am I!" }
+1.times { puts 'As am I!' }
 ##########
-[:weezard, 42, "Trady Blix", 3, true, 19, 12.345].select { |x| x.is_a? Integer } # => [42, 3, 19]
+[:weezard, 42, 'Trady Blix', 3, true, 19, 12.345].map { |x| x.is_a? Integer } # => [42, 3, 19]
 ##########
 def double (par)
   yield par
@@ -437,17 +442,17 @@ round_down = proc { |x| x.floor } # The .floor method rounds a float (a number w
 [1.2, 3.45, 0.91, 7.727, 11.42, 482.911].collect(&round_down)
 ##########
 def greeter
-  puts "We're in the method"
-  yield("John Doe")
+  puts 'We\'re in the method'
+  yield('John Doe')
 end
 
 phrase = Proc.new { |x| puts "Hello there #{x}!" }
 greeter(&phrase)
 ##########
-hi = Proc.new { puts "Hello" }
+hi = Proc.new { puts 'Hello' }
 hi.call
 ##########
-["1", "2", "3"].map(&:to_i) # convert symbols to procs
+%w[1 2 3].map(&:to_i) # convert strings to int
 # ==> [1, 2, 3]
 ##########
 under_100 = Proc.new { |x| x < 100 }
@@ -473,20 +478,20 @@ lambda_demo { puts "I'm the lambda!" }
 # ==> I'm the lambda!
 ##########
 symbolize = lambda { |x| x.to_sym }
-symbols   = ["leonardo", "donatello", "raphael", "michaelangelo"].map(&symbolize)
+symbols   = %w[leonardo donatello raphael michaelangelo].map(&symbolize)
 ##########
 def batman_ironman_proc
-  victor = Proc.new { return "Batman will win!" } # it returns immediately, without going back to the batman_ironman_proc method
+  victor = Proc.new { return 'Batman will win!' } # it returns immediately, without going back to the batman_ironman_proc method
   victor.call
-  "Iron Man will win!"
+  'Iron Man will win!'
 end
 
 puts batman_ironman_proc
 
 def batman_ironman_lambda
-  victor = lambda { return "Batman will win!" }
+  victor = lambda { return 'Batman will win!' }
   victor.call
-  "Iron Man will win!" # returns the last code
+  'Iron Man will win!' # returns the last code
 end
 
 puts batman_ironman_lambda
@@ -496,18 +501,18 @@ puts batman_ironman_lambda
 
 ##########
 symbol_filter = lambda { |x| x.is_a? Symbol }
-symbols       = ["raindrops", :kettles, "whiskers", :mittens, :packages].select(&symbol_filter)
+symbols       = ['raindrops', :kettles, 'whiskers', :mittens, :packages].select(&symbol_filter)
 # ==> [:kettles, :mittens, :packages]
 ##########
 crew          = {
-  captain:        "Picard",
-  first_officer:  "Riker",
-  lt_cdr:         "Data",
-  lt:             "Worf",
-  ensign:         "Ro",
-  counselor:      "Troi",
-  chief_engineer: "LaForge",
-  doctor:         "Crusher"
+  captain:        'Picard',
+  first_officer:  'Riker',
+  lt_cdr:         'Data',
+  lt:             'Worf',
+  ensign:         'Ro',
+  counselor:      'Troi',
+  chief_engineer: 'LaForge',
+  doctor:         'Crusher'
 }
 
 first_half = lambda { |key, value| value < "M" }
@@ -519,11 +524,11 @@ a_to_m     = crew.select(&first_half)
 
 ## compare
 ###############################
-book_1     = "A Wrinkle in Time"
-book_2     = "A Brief History of Time"
+book_1     = 'A Wrinkle in Time'
+book_2     = 'A Brief History of Time'
 book_1 <=> book_2 #compare
 ############
-books = ["Charlie and the Chocolate Factory", "War and Peace", "Utopia", "A Brief History of Time", "A Wrinkle in Time"]
+books = ['Charlie and the Chocolate Factory', 'War and Peace', 'Utopia', 'A Brief History of Time', 'A Wrinkle in Time']
 # To sort our books in ascending order, in-place
 books.sort! { |firstBook, secondBook| secondBook <=> firstBook }
 ###############################
@@ -568,22 +573,22 @@ cur_weather.lines do |line|
 end
 # 'It\'s a rainy day outside'
 ##########
-"Hello".include? "lo" #true
-"Hello".include? ?h #true
+'Hello'.include? 'lo' #true
+'Hello'.include? ?h #true
 ##########
-puts "hello".methods.grep /case/ #выводит все методы относящиеся к strig и содержащие case
-puts "hello".casecmp "HeLlo" #сравнивает строки игнорируя регистр
+puts 'hello'.methods.grep /case/ #выводит все методы относящиеся к string и содержащие case
+puts 'hello'.casecmp 'HeLlo' #сравнивает строки игнорируя регистр
 ##########
-"Yukihiro " << "Matsumoto"
+'Yukihiro ' << 'Matsumoto'
 # ==> "Yukihiro Matsumoto"
 ##############################
 
 #regexp
 ###############################
-["Dmitry Sadovnikov", "Ivan Ivanov"].each do |r|
-  matches   =/(\w+) (\w+)/.match r
-  first_name=matches[1]
-  last_name =matches[2]
+['Dmitry Sadovnikov', 'Ivan Ivanov'].each do |r|
+  matches    =/(\w+) (\w+)/.match r
+  first_name = matches[1]
+  last_name  = matches[2]
   puts first_name
   puts last_name
 end
@@ -631,15 +636,15 @@ MyClass.new.my_method # 'efined my method'
 #if metdod didnt define you will not see error you will see a message "sorry..."
 class Mistery
   def method_missing (method, *args)
-    puts "Looking for"
+    puts 'Looking for'
     puts "\"#{method}\" with params (#{args.join(',')}) ?"
-    puts "Sorry... He is on vacation..."
-    yield "Ended up in method_missing" if block_given?
+    puts 'Sorry... He is on vacation...'
+    yield 'Ended up in method_missing' if block_given?
   end
 end
 
 m = Mistery.new
-m.solve_mistery("abc", 123123) do |answer|
+m.solve_mistery('abc', 123123) do |answer|
   puts "And the answer is: #{answer}"
 end
 ###
@@ -659,8 +664,8 @@ k.instance_eval { @secret } #=> 99
 k.instance_eval { the_secret } #=> "Ssssh! The secret is 99."
 ###
 class MyClass
-  def name;
-    'Dima';
+  def name
+    'Dima'
   end
 
   deprecate :name
@@ -672,8 +677,8 @@ MyClass.new.name
 ###
 # aliases
 class MyClass
-  def name;
-    'Dima';
+  def name
+    'Dima'
   end
 
   alias_method :first_name, :name
@@ -688,8 +693,8 @@ singleton_class = class << obj
   self
 end
 
-def obj.my_singleton_method;
-  'Dima';
+def obj.my_singleton_method
+  'Dima'
 end
 
 obj.my_singleton_method # => 'Dima'
@@ -797,9 +802,9 @@ k1 = Demo.new(99)
 b1 = k1.get_binding
 k2 = Demo.new(-3)
 b2 = k2.get_binding
-eval("@secret", b1) #=> 99
-eval("@secret", b2) #=> -3
-eval("@secret") #=> nil
+eval('@secret', b1) #=> 99
+eval('@secret', b2) #=> -3
+eval('@secret') #=> nil
 ###
 
 
@@ -867,3 +872,34 @@ str.title? # => false
 str.singleton_methods # => [:title?]
 ###
 ##############################
+
+
+### Algorithms
+
+# factorial
+def factorial_recursive(n)
+  n == 0 ? 1 : n * factorial_recursive(n - 1)
+end
+
+def factorial_iterative(n)
+  (1..n).inject(:*)
+end
+
+class Integer
+  def factorial_iterative
+    (1..self).inject(:*) || 1
+  end
+end
+
+#
+
+# fibonacci
+def fibonacci_iterative(n)
+  (0..n).each_with_object([]) { |i, seq| seq << (i < 2 ? i : seq[-1] + seq[-2]) }.last
+end
+
+def fibonacci_recursive(n)
+  n < 2 ? n : fibonacci_recursive(n - 1) + fibonacci_recursive(n - 2)
+end
+
+###
