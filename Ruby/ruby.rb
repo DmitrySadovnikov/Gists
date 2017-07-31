@@ -1,17 +1,39 @@
-##methods
-##############################
 require 'file_name' # includes file
-include ModuleName # includes instance methods
-extend  ModuleName # includes class methods
-prepend ModuleName # includes class methods above self methods
+include ModuleName  # includes instance methods
+extend  ModuleName  # includes class methods
+prepend ModuleName  # includes methods above instance methods
+###
+order&.email
+order.try(:email)
+###
+def xxx(*)
+  super(4, 5, 6)
+end
+###
+def foo(a, *b, **c)
+  [a, b, c]
+end
 
-Klass < ParentClass # inheritence
-
+foo 10                        # => [10, [], {}]
+foo 10, 20, 30                # => [10, [20, 30], {}]
+foo 10, 20, 30, d: 40, e: 50  # => [10, [20, 30], {d: 40, e: 50}]
+foo 10, d: 40, e: 50          # => [10, [], {d: 40, e: 50}]
+###
+def x(a:)
+  local_variables.each { |v| puts eval "#{v}" }
+end
+x(a: 10) # => 10
+###
+def x(*)
+  local_variables.each { |v| puts eval "#{v}" }
+end
+x(10) # => 10
+###
 /sera/ === 'coursera' && 'coursera' === 'coursera' && Integer === 21 # сравнивает объект и класс
 [9, 3, 4, 9, 5].count(9) # => 2
 
 ##
-a =  [:foo] * 4   # => [:foo, :foo, :foo, :foo]
+a =  [:foo] * 4  # => [:foo, :foo, :foo, :foo]
 a = *[:foo] * 4  # => :foo, :foo, :foo, :foo   it's split arguments
 ##
 # string to ruby code
@@ -30,6 +52,29 @@ def human_repayment_frequency
   }[order.repayment_frequency]
 end
 
+# inject
+######
+'ModuleName::KlassName'.split('::').inject(Object) { |par, const| par.const_get(const) } # вернет KlassName
+######
+(1..3).inject([]) { |arr, n| arr << n}           # => [1, 2, 3]
+(1..3).inject({}) { |hsh, n| hsh.merge(n => 0) } # => { 1 => 0, 2 => 0, 3 => 0 }
+######
+[1, 2, 3].inject { |res, i| res + i } # => 6
+[1, 2, 3].inject(:+) # => 6
+[true, false, true].inject(:&) == false
+[true, true, true].inject(:&)  == true
+######
+[1, 2, 3].any? { |x| x == 1 } # => true
+######
+set = Set.new [1, 'str1', 'str2', 2, 4]
+set.classify { |f| f.class } # => {Fixnum=>#<Set: {1, 2, 4}>, String=>#<Set: {"str1", "str2"}>}
+######
+h = {a: 1, b: 2, c: 3}
+h.each_key { |k| puts h[k] }
+######
+"aaa\nbbbb".each_line { |x| puts x }
+######
+%w(aaa bbb ccc add).grep(/^a/) { |el| el } # => ["aaa", "add"]
 ######
 x = proc { |x| x + 1}
 x.call(2) # => 3
@@ -37,17 +82,10 @@ x.(2)     # => 3
 ######
 (1..20).each { |i| puts i if (i == 3)..(i == 15) }
 ######
-[[1, 2], [3, 4]].each { |(first, second)| ... }
+[[1, 2], [3, 4]].each { |(first, second)| p first } # => 1, 3
 ######
 BigDecimal.new('123.45678901234567890').to_s('3F') # "123.456 789 012 345 678 9"
 ######
-
-# inject
-[1, 2, 3].inject { |res, i| res + i } # => 6
-[1, 2, 3].inject(:+) # => 6
-[true, false, true].inject(:&) == false
-[true, true, true].inject(:&)  == true
-###
 
 # tap - принимает на вход себя и изменяет
 hash = {
@@ -58,45 +96,34 @@ hash = {
 hash.tap { |el| el[:name].capitalize!; el[:sex] = 'male' }
 # => {:id=>1, :name=>"Dima", :age=>26, :sex=>"male"}
 ######
-# если переменная не используется поставь _ в ее названиии
-hash.each { |k, _v| puts k }
-######
-hash = {marko: 'polo'}
-hash.fetch(:marko) #=> 'polo'
+hash = { marko: 'polo' }
+hash.fetch(:marko)        # => 'polo'
+hash.fetch(:marko, false) # если hash[:marko] == nil, то вернется false
 ######
 # change if something exists
 something &&= something.downcase
 ######
-# arguments with two dots
-def foo(bar:); end
-foo(bar: "biz")
-######
 4.next # will return 5
-
-[1, 2, 3].map(&:to_s) # => ["1", "2", "3"]
-
+######
 obj.respond_to? :some_method # true / false
 
-select, reject, map, inject, detect
-
-puts # => println
-p # => println
-print # => print
-gets # => input text
-<=> # => comparator
-.sample(x) # выводит случайные x элемента массива
-.is_a? # => intenceOf
-.kind_of? # => intenceOf
-.chomp # обрезает \n в конце
-.select # => выбирает из массива значения соотв заданным условиям
-.collect # => it returns a new array with the same parameters
-.collect!.map! # => methods do the exact same thing
-.gsub!(/s/, "th") # => replace
-.include? # => contains
-.start_with?
-.end_with?
-.index # return index of letter in string
-.lstrip # - удаляет пробелы
+# methods
+puts             # => println and return nil
+p                # => println
+print            # => print
+gets             # => input text
+<=>              # comparator
+sample(x)        # выводит случайные x элемента массива
+is_a?            # => intenceOf
+kind_of?         # => intenceOf
+chomp            # обрезает \n в конце
+select           # => выбирает из массива значения соотв заданным условиям
+gsub!(/s/, 'th') # => replace
+include?         # => contains
+index            # return index of letter in string
+lstrip           # удаляет пробелы
+start_with?
+end_with?
 
 # перенос строки
 'this is very' \
@@ -123,50 +150,45 @@ module M
     module M2
       Module.nesting # => [M::C::M2, M::C, M]
 
-
       date = Date.current + 1.year
       date.future?
-      'word'.pluralize # => words
-      'words'.singularize # => word
-      'hello_world'.camelize # => HelloWorld
-      'HelloWorld'.underscore # => hello_world
-      'hello_world'.dasherize # => hello-world
-      'hello world'.parameterize # => hello-world
+      'word'.pluralize             # => words
+      'words'.singularize          # => word
+      'hello_world'.camelize       # => HelloWorld
+      'HelloWorld'.underscore      # => hello_world
+      'hello_world'.dasherize      # => hello-world
+      'hello world'.parameterize   # => hello-world
       'Hello     world    '.squish # => "Hello world"
-        .upcase # =>toUpperCase()
-        .downcase # =>toDownCase()
-        .capitalize # => make first char is uppercase
+      'word'.upcase                # => WORD
+      'WORD'.downcase              # => word
+      'word'.capitalize            # => Word
+      'word'.intern                # => :word
 
       begin
       rescue SomeExceptionClass => some_variable
       rescue SomeOtherException => some_other_variable
       else
       ensure
-        # код выполгяется всегда
+        # код выполняется всегда
       end
     end
   end
 end
 ##############################
 
-##Symbols
-##############################
-"sasquatch".intern # ==> :sasquatch
-##############################
-
 ##variables
 ##############################
-alpa, _indent, some_var # local var
-self, nil, FILE # pseudo var
-K6chip, length, LENGTH, ALL_CAPS # constants
-@foobar, @thx1138, @NOT_CONST # var of exemplar
+alpa, _indent, some_var           # local var
+self, nil, FILE                   # pseudo var
+K6chip, length, LENGTH, ALL_CAPS  # constants
+@foobar, @thx1138, @NOT_CONST     # var of exemplar
 @@phydeaux, @@my_var, @@NOT_CONST # var of class
-$beta, $B12vitamin, $NOT_CONST # global var
-CamelCase # class name
+$beta, $B12vitamin, $NOT_CONST    # global var
+CamelCase                         # class name
 
-Fixnum (целые числа, меньшие 2^{ 30 }),
-       Bignum (целые числа, большие 2^{ 30 }),
-              Float
+Fixnum # (целые числа, меньшие 2^{ 30 }),
+Bignum # (целые числа, большие 2^{ 30 }),
+Float
 Array
 String
 Hash
@@ -175,13 +197,13 @@ Hash
 ##increment
 ##############################
 #succ and next are equals
-"abcd".succ #-> "abce"
-"THX1138".succ #-> "THX1139"
-"<<koala>>".succ #-> "<<koalb>>"
-"1999zzz".succ #-> "2000aaa"
-"ZZZ9999".succ #-> "AAAA0000"
-"***".succ #-> "**+"
-"zzz".next #-> "aaaa"
+'abcd'.succ      # => 'abce'
+'THX1138'.succ   # => 'THX1139'
+'<<koala>>'.succ # => '<<koalb>>'
+'1999zzz'.succ   # => '2000aaa'
+'ZZZ9999'.succ   # => 'AAAA0000'
+'***'.succ       # => '**+'
+'zzz'.next       # => 'aaaa'
 ##############################
 
 
@@ -194,12 +216,12 @@ Customer = Struct.new(:name, :address) do
   end
 end
 
-Customer.new("Jim", "-1000 Wall Street").to_s
+Customer.new('Jim', '-1000 Wall Street').to_s
 ##########
 require 'ostruct'
-some_object        = OpenStruct.new(name: "Joe", age: 15)
-some_object.sure   = "three"
-some_object.really = "yes, it is true"
+some_object        = OpenStruct.new(name: 'Joe', age: 15)
+some_object.sure   = 'three'
+some_object.really = 'yes, it is true'
 some_object.digit  = 10
 puts "#{some_object.name} #{some_object.age} #{some_object.really}"
 ###########################
@@ -220,26 +242,24 @@ end
 ##########
 arr = %w{Hi my name is Borya}
 arr.each_with_index do |x, index|
-  arr[index] = "Vova" if x == "Borya"
+  arr[index] = 'Vova' if x == 'Borya'
 end
 print arr # => [Hi, my, name, is, Vova]
 ##########
 i = 0
 while i < 3
-  i + = 1
+  i += 1
 end
 ##########
 until i > 3
-  i + = 1
+  i += 1
 end
 ##########
-for i in 0..2;
-end
+for i in 0..2; end
 ##########
-for i in (1..4).reverse_each;
-end
+for i in (1..4).reverse_each; end
 ##########
-3.times { puts "Hello World" }
+3.times { puts 'Hello World' }
 ##########
 times_2 = 2
 times_2 *= 2 while times_2 < 100
@@ -253,71 +273,68 @@ end
 
 ## Arrays
 ##############################
-# push or <<     #append
-# pop or shift   #remove
-# [] = (method)  #set
+# push or <<   # append
+# pop or shift # remove
 ###########
-Array('firefly') #=> ['firefly']
+Array('firefly') # => ['firefly']
 ###########
-[[1, 2, 3], [4, 5, 6]].flatten == [1, 2, 3, 4, 5, 6] #раскрывает массвы в массиве nested arrays
+[[1, 2, 3], [4, 5, 6]].flatten == [1, 2, 3, 4, 5, 6]
 ###########
 very_long_array =
   ['elemrnt_number_n', 'elemrnt_number_n', 'elemrnt_number_n', 'elemrnt_number_n',
    'elemrnt_number_n',
    'elemrnt_number_n', 'elemrnt_number_n', 'elemrnt_number_n', 'elemrnt_number_n']
 ###########
-first, *list    = [1, 2, 3, 4, 5]
+first, *list = [1, 2, 3, 4, 5]
 first # => 1
-list # => [2,3,4,5]
+list  # => [2,3,4,5]
 ###########
-hello_array      = *'Hello'
+hello_array = *'Hello'
 ###########
-a                = *(1..3) # => [1,2,3]
+a = *(1..3) # => [1,2,3]
 ###########
 # отбросить последний элемент массива
-foo              = '0, 1, 2, 4, 8, 16, 32'
-*begining, _last = foo.split(', ') # => ["0", "1", "2", "4", "8", "16", "32"]
+*begining, _last = '0, 1, 2, 4, 8, 16, 32'.split(', ')
 begining # => ["0", "1", "2", "4", "8", "16"]
-_last # => "32"
+_last    # => "32"
 ###########
 a = [2, 4, 8]
-a.push(16, 32) # a => [2, 4, 8, 16, 32]
+a.push(16, 32)  # a => [2, 4, 8, 16, 32]
 a.unshift(0, 1) # a => [0, 1, 2, 4, 8, 16, 32]
-puts a.shift # a => [1, 2, 4, 8, 16, 32] выводим на экран первый элемент массива и удаляем его из массива
-puts a.pop # a => [1, 2, 4, 8, 16] выводим на экран последний элемент массива и удаляем его из массива
+puts a.shift    # a => [1, 2, 4, 8, 16, 32] выводим на экран первый элемент массива и удаляем его из массива
+puts a.pop      # a => [1, 2, 4, 8, 16] выводим на экран последний элемент массива и удаляем его из массива
 << == push
 ###########
 [1, nil, 3, nil, nil].compact # => [1, 3]  delete nil from array
 ###########
-a         = [1, 2, 3]
-b         = [3, 4, 5]
-c         = a & b # 3
-c         = (a - b) | (b - a) # 1,2,4,5
+a = [1, 2, 3]
+b = [3, 4, 5]
+c = a & b # 3
+c = (a - b) | (b - a) # 1, 2, 4, 5
 ###########
-arr_words = %w{ what a great day today! }
-puts arr_words[-2] # => day (what - 0 element, today - -1 elem, day - -2 elem)
-puts arr_words[-3, 2] # => ["great", "day"] (go back 3 and take 2)
-puts arr_words[2..4] # => ["great", "day", "today!"]
+arr_words = %w{what a great day today!}
+puts arr_words[-2]       # => day (what - 0 element, today - -1 elem, day - -2 elem)
+puts arr_words[-3, 2]    # => ["great", "day"] (go back 3 and take 2)
+puts arr_words[2..4]     # => ["great", "day", "today!"]
 puts arr_words.join(',') # => what,a,great,day,today!
 ###########
-puts [1, 2, 3].sample 2 # выводит случайные два элемента массива random
+puts [1, 2, 3].sample(2) # выводит случайные два элемента массива random
 (1..10000).to_a.sample(23)
 ###########
 arr = [1, 3, 8888, 9999, 7777, 3333, 6666]
 arr.select { |element| element % 3 == 0 }
 arr.reject { |element| element < 5000 }
 arr.sort.reverse
-###
-#Up the Down Staircase
-95.upto(100) { |num| print num, " " } # Prints 95 96 97 98 99 100
-45.downto(40) { |num| print num, " " } # Prints 45 44 43 42 41 40
-"L".upto("P") { |x| print x, " " } # Prints L M N O P
+###########
+95.upto(100)  { |num| print num, ' ' } # Prints 95 96 97 98 99 100
+45.downto(40) { |num| print num, ' ' } # Prints 45 44 43 42 41 40
+'L'.upto('P') { |x| print x, ' ' }     # Prints L M N O P
 ###########
 
 
 #word frequency count histogram
 word_frequency = Hash.new(0)
-"Chicka chicka boom boom".split.each do |word|
+'Chicka chicka boom boom'.split.each do |word|
   word_frequency[word.downcase] += 1
 end
 
@@ -390,7 +407,7 @@ puts max('something', 7, 32, -4, 'more') # ==> 32
 
 ##BLOCKS
 ############################
-def meth(a, b, &blok)
+def meth(a, b, &block)
   3 + yield(a, b) if block_given?
 end
 
@@ -414,7 +431,7 @@ double (2) { |x| puts x * 2 }
 ###############################
 # Отличия лямбды от прока
 def meth
-  la = -> { return 10 } # return возвращает из лямбды в метод
+  la =   -> { return 10 }   # return возвращает из лямбды в метод
   pr = proc { return 20 } # return возвращает из метода
   return 1 + 2 # не выполняется из-за proc's return
 end
@@ -467,13 +484,13 @@ succ = -> (x) { x + 1 }
 succ.call(2)
 ###
 def lambda_demo(a_lambda)
-  puts "I'm the method!"
+  puts 'I\'m the method!'
   a_lambda.call
 end
 
-lambda_demo(lambda { puts "I'm the lambda!" })
+lambda_demo(lambda { puts 'I\'m the lambda!' })
 # or
-lambda_demo { puts "I'm the lambda!" }
+lambda_demo { puts 'I\'m the lambda!' }
 # ==> I'm the method!
 # ==> I'm the lambda!
 ##########
@@ -515,7 +532,7 @@ crew          = {
   doctor:         'Crusher'
 }
 
-first_half = lambda { |key, value| value < "M" }
+first_half = lambda { |key, value| value < 'M' }
 a_to_m     = crew.select(&first_half)
 # => {:lt_cdr=>"Data", :chief_engineer=>"LaForge", :doctor=>"Crusher"}
 ##########
@@ -524,8 +541,8 @@ a_to_m     = crew.select(&first_half)
 
 ## compare
 ###############################
-book_1     = 'A Wrinkle in Time'
-book_2     = 'A Brief History of Time'
+book_1 = 'A Wrinkle in Time'
+book_2 = 'A Brief History of Time'
 book_1 <=> book_2 #compare
 ############
 books = ['Charlie and the Chocolate Factory', 'War and Peace', 'Utopia', 'A Brief History of Time', 'A Wrinkle in Time']
@@ -553,12 +570,11 @@ end
 File.foreach('test.txt') { |line| puts line.chomp } if File.exist? 'test.txt'
 #write
 # w - переписать, a - дописать
-File.open("test1.txt", "w") { |file| file.puts "One line" }
+File.open('test1.txt', 'w') { |file| file.puts 'One line' }
 # load file in class
 def load_file
   load 'file.rb'
 end
-
 ##############################
 
 
@@ -615,6 +631,28 @@ def add_checked_attribute(klass, attribute)
 end
 
 add_checked_attribute('Jopa', 'name')
+###
+class A
+  def foo
+    bar do
+      <<~EOF
+        texttext
+          text
+      EOF
+    end
+  end
+end
+
+class A
+  def foo
+    bar do
+      <<EOF
+texttext
+  text
+EOF
+    end
+  end
+end
 ###
 # Переобределяем методы в другом классе
 class MyClass
@@ -774,7 +812,7 @@ end
 String.class_eval do
   prepend ExplicitString
 end
-"War and Peace".length
+'War and Peace'.length
 ###
 
 
@@ -902,4 +940,28 @@ def fibonacci_recursive(n)
   n < 2 ? n : fibonacci_recursive(n - 1) + fibonacci_recursive(n - 2)
 end
 
+### protected
+class C
+  def initialize(number)
+    @number = number
+  end
+
+  def compare(c)
+    if c.number > number
+      puts "The other object's number is bigger."
+    else
+      puts "The other object's number is the same or smaller."
+    end
+  end
+
+  protected
+
+  def number
+    @number
+  end
+end
+
+c1 = C.new(100)
+c2 = C.new(101)
+c1.compare(c2)
 ###

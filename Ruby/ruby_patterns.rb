@@ -1,22 +1,22 @@
 ####################################
 ####################################
-# STI       — одна таблица и много моделей
-# template method Когда есть единые методы
-# Adapter   - В зависимомсти от передаваемого параметра вызывает разные методы класса или вызвать опред класс
-# Strategy  - Когда есть единый базовый класс с базовыми методами
-# Decorator - Прячет методы
-# Factory   - Очень похож на адаптер, вызывает класс в зависимости от передаваемого объекта
-# Iterator  - метод с блоком для итерации
-# Visitor   - в зависимости от класса прешедшей переменной вызывает определенный метод
-# Observer  - следит за изменениями в классе
-# Singleton - возвращает всегда один и тотже объект
-# State     - указываем в каком статусе находится объект
-# Builder   - создаёт объекты класса, относяшиеся к текущему классу (создает внутри него)
+# STI             — Одна таблица и много моделей
+# Template method - Когда есть, необходимые имплементировать
+# Adapter         - В зависимомсти от передаваемого параметра вызывает разные методы класса или вызвать опред класс
+# Strategy        - Когда есть единый базовый класс с базовыми методами
+# Decorator       - Прячет методы
+# Factory         - Очень похож на адаптер, вызывает класс в зависимости от передаваемого объекта
+# Iterator        - Метод с блоком для итерации
+# Visitor         - В зависимости от класса прешедшей переменной вызывает определенный метод
+# Observer        - Следит за изменениями в классе
+# Singleton       - Возвращает всегда один и тотже объект
+# State           - Указываем в каком статусе находится объект
+# Builder         - Создаёт объекты класса, относяшиеся к текущему классу (создает внутри него)
 
 ####################################
 
 ######### template method ##########
-# Когда есть единые методы
+# Когда есть, необходимые имплементировать
 
 Generators::Markdown.new.header
 
@@ -161,9 +161,9 @@ module Newsletter
 
       def parse
         xml   = Nokogiri::Xml source
-        title = xml.xpath("//item/title")[0].children[0].text
-        body  = xml.xpath("//item/body")[0].children[0].text
-        { "title" => title, "body" => body }
+        title = xml.xpath('//item/title')[0].children[0].text
+        body  = xml.xpath('//item/body')[0].children[0].text
+        { 'title' => title, 'body' => body }
       end
     end
   end
@@ -173,7 +173,7 @@ end
 product_decorator = ProductDecorator.new product
 product_decorator.as_html_row
 
-require "forwardable"
+require 'forwardable'
 
 class Product
   attr_reader :name, :category, :tags
@@ -339,8 +339,8 @@ User.active.merge(User.inactive)
 ###############################
 
 #### Visitor - в зависимости от класса прешедшей переменной вызывает определенный метод ####
-Node.accept(9);
-Node.accept("9");
+Node.accept(9)
+Node.accept('9')
 
 class Node
   def accept value
@@ -393,7 +393,7 @@ end
 ########
 
 #### Singleton - возвращает всегда один и тотже объект ####
- PRODUCT = Product.new("Tomato", :fruit)
+ PRODUCT = Product.new('Tomato', :fruit)
  class ProductController
    attr_reader :product
    include Singleton
@@ -444,13 +444,13 @@ class RentalPlan
     @ranges   = ranges
   end
 
-  def self.build name
+  def self.build(name)
     build_metadata name
     build_list_of_ranges
     new(@metadata, @ranges)
   end
 
-  def self.build_metadata, name
+  def self.build_metadata(name)
     @metadata = Metadata.new name
   end
 
