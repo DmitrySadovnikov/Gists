@@ -1,3 +1,41 @@
+describe Class do
+  let(...) { }
+
+  describe '#method' do
+    let(...) { }
+
+    include_examples 'universal success case tests'
+
+    it 'works good in default context'
+
+    context 'in situation 1' do
+      let(...) { }
+
+      include_examples 'universal success case tests'
+
+      it 'still works good'
+    end
+
+    context 'in situation 2' do
+      include_context 'for situations 2 and 3'
+
+      let(...) { }
+
+      include_examples 'universal success case tests'
+
+      it 'still works good'
+    end
+
+    context 'in situation 3' do
+      include_context 'for situations 2 and 3'
+
+      let(...) { }
+
+      it 'fails'
+    end
+  end
+end
+
 result = @ledger.record({ 'some' => 'data' })
 result.success? # => a Boolean
 result.expense_id # => a number

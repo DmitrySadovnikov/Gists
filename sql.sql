@@ -1,3 +1,6 @@
+/* case-insensitive search */
+SELECT title from orders WHERE title ILIKE '%батарея%' LIMIT 10
+
 
 /*Commands*/
 CREATE TABLE creates -- a new table.

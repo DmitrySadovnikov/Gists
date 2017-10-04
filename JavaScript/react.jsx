@@ -1,3 +1,56 @@
+// setup
+// npm install -g create-react-app
+// create-react-app react-todo
+
+//npm i --save react
+//npm i -S react-dom
+//npm install --save-dev babel-core (npm install -D babel-core)
+//npm install --save-dev babel-core babel-loader babel-preset-react (npm i -D babel-{core,loader} babel-preset-react)
+
+//.babelrc
+{ presets: ['react'] }
+
+//npm i -D webpack webpack-dev-server html-webpack-plugin
+
+//webpack.config.js
+var HTMLWebpackPlugin = require('html-webpack-plugin');
+var HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
+  template: __dirname + '/app/index.html',
+  filename: 'index.html',
+  inject: 'body'
+});
+
+module.exports = {
+  entry: __dirname + '/app/index.js',
+  module: {
+    loaders: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader'
+      }
+    ]
+  },
+  output: {
+    filename: 'transformed.js', //This will save your transformed JavaScript into a new file named build/transformed.js.
+    path: __dirname + '/build'
+  },
+  plugins: [HTMLWebpackPluginConfig]
+};
+
+//package.json
+scripts: {
+  deploy: "npm run build && npm run git-commit && npm run git-push", //after that use on console npm run deploy
+  build: "webpack",
+  start: "webpack-dev-server"
+}
+
+////
+
+
+
+
+
 /// module export
 
 var NavBar     = require('./NavBar'); // main file
@@ -610,3 +663,430 @@ const styles = {
 const styleMe = <h1 style={styles}>Please style me! I am so bland!</h1>;
 
 ////
+// facebook color palette
+const blue      = 'rgb(139, 157, 195)';
+const darkBlue  = 'rgb(059, 089, 152)';
+const lightBlue = 'rgb(223, 227, 238)';
+const grey      = 'rgb(247, 247, 247)';
+const white     = 'rgb(255, 255, 255)';
+
+export const colorStyles = {
+  blue:      blue,
+  darkBlue:  darkBlue,
+  lightBlue: lightBlue,
+  grey:      grey,
+  white:     white,
+};
+
+// in main file
+import { styles } from './styles';
+const divStyle = {
+  background: styles.background,
+  height:     '100%'
+};
+export class Home extends React.Component {
+  render() {
+    return (
+      <div style={divStyle}>
+        <AttentionGrabber />
+        <footer>THANK YOU FOR VISITING MY HOMEPAGE!</footer>
+      </div>
+    );
+  }
+}
+////
+
+
+
+//// Stateless Functional Components
+// GuineaPigs.js
+import React from 'react';
+
+export class GuineaPigs extends React.Component {
+  render() {
+    let src = this.props.src;
+    return (
+      <div>
+        <h1>Cute Guinea Pigs</h1>
+        <img src={src} />
+      </div>
+    );
+  }
+}
+
+// Friends.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+
+export const Friend = () => {// OR  export class Friend extends React.Component {
+  render(){
+    return <img src='https://s3.amazonaws.com/codecademy-content/courses/React/react_photo-octopus.jpg' />;
+  }
+}
+
+ReactDOM.render(
+  <Friend />,
+  document.getElementById('app')
+);
+////
+
+
+
+
+// PropTypes
+render() {
+  return <h1>{this.props.message}</h1>;
+}
+MessageDisplayer.propTypes = {
+  message: React.PropTypes.string
+};
+// prototypes usual way
+class Example extends React.component{
+}
+Example.propTypes = {
+
+};
+// prototypes functional way
+const Example = (props) => {
+  return <h1>{props.message}</h1>;
+}
+
+Example.propTypes = {
+  message: React.PropTypes.string.isRequired
+};
+// example - change text from h1 to input text
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+export class Input extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { userInput: '' };
+
+    this.handleUserInput = this.handleUserInput.bind(this);
+  }
+  render() {
+    return (
+      <div>
+        <input value={this.state.userInput} onChange={this.handleUserInput} type="text"/>
+        <h1>{this.state.userInput}</h1>
+      </div>
+    );
+  }
+  handleUserInput(e) {
+    this.setState({
+      userInput: e.target.value
+    });
+  }
+}
+
+
+ReactDOM.render(
+  <Input />,
+  document.getElementById('app')
+);
+////
+
+
+
+// querySelector
+let input = document.querySelector('input[type="text"]');
+let typedText = input.value; // input.value will be equal to whatever text is currently in the text box.
+////
+
+
+
+
+
+
+
+
+
+
+
+/////  Lifecycle Methods
+// There are three categories of lifecycle methods: mounting, updating, and unmounting
+
+// There are three MOUNTING lifecycle methods:
+// componentWillMount
+// render
+// componentDidMount
+
+// example
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+export class Example2 extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { text: '' };
+  }
+
+  componentWillMount() {
+    this.setState({ text: 'Hello world' });
+  }
+
+  render() {
+    return <h1>{this.state.text}</h1>;
+  }
+}
+
+ReactDOM.render(
+  <Example2 />,
+  document.getElementById('app')
+);
+// example
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+export class Example extends React.Component {
+  componentWillMount() {
+    alert('component is about to mount!');
+  }
+
+  render() {
+    return <h1>Hello world</h1>;
+  }
+}
+
+ReactDOM.render(
+  <Example />,
+  document.getElementById('app')
+);
+
+setTimeout(() => {
+  ReactDOM.render(
+    <Example />,
+    document.getElementById('app')
+  );
+}, 2000);
+
+//example
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+export class Flashy extends React.Component {
+  componentWillMount() {
+    alert('AND NOW, FOR THE FIRST TIME EVER...  FLASHY!!!!');
+  }
+  componentDidMount() {
+    alert('YOU JUST WITNESSED THE DEBUT OF...  FLASHY!!!!!!!');
+  }
+
+  render() {
+
+    alert('Flashy is rendering!');
+
+    alert('YOU JUST WITNESSED THE DEBUT OF...  FLASHY!!!!!!!');
+
+    return (
+      <h1 style={{ color: this.props.color }}>
+        OOH LA LA LOOK AT ME I AM THE FLASHIEST
+      </h1>
+    );
+  }
+}
+
+ReactDOM.render(
+  <Flashy color='red' />,
+  document.getElementById('app')
+);
+
+setTimeout(() => {
+  ReactDOM.render(
+    <Flashy color='green' />,
+    document.getElementById('app')
+  );
+}, 2000);
+////
+
+// componentWillReceiveProps
+// example
+import React from 'react';
+
+export class Example extends React.Component {
+  componentWillReceiveProps(nextProps) {
+    alert("Check out the new props.text that "
+      + "I'm about to get:  " + nextProps.text);
+  }
+
+  render() {
+    return <h1>{this.props.text}</h1>;
+  }
+}
+
+
+// The first render won't trigger
+// componentWillReceiveProps:
+ReactDOM.render(
+  <Example text="Hello world" />,
+  document.getElementById('app')
+);
+
+// After the first render,
+// subsequent renders will trigger
+// componentWillReceiveProps:
+setTimeout(() => {
+  ReactDOM.render(
+    <Example text="Hello world" />,
+    document.getElementById('app')
+  );
+}, 1000);
+
+//shouldComponentUpdate
+// example
+// if shouldComponentUpdate returns false, then the component will not update
+import React from 'react';
+
+export class Example extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { subtext: 'Put me in an <h2> please.' };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if ((this.props.text == nextProps.text) &&
+      (this.state.subtext == nextState.subtext)) {
+      alert("Props and state haven't changed, so I'm not gonna update!");
+      return false;
+    } else {
+      alert("Okay fine I will update.")
+      return true;
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>{this.props.text}</h1>
+        <h2>{this.state.subtext}</h2>
+      </div>
+    );
+  }
+}
+
+//componentWillUpdate
+//example
+import React from 'react';
+
+export class Example extends React.Component {
+  componentWillUpdate(nextProps, nextState) {
+    alert('Component is about to update!  Any second now!');
+  }
+
+  render() {
+    return <h1>Hello world</h1>;
+  }
+}
+
+//componentDidUpdate
+import React from 'react';
+
+export class Example extends React.component {
+  componentDidUpdate(prevProps, prevState) {
+    alert('Component is done rendering!');
+  }
+
+  render() {
+    return <h1>Hello world</h1>;
+  }
+}
+//componentWillUnmount
+//A component's unmounting period occurs when the component is removed from the DOM
+// Enthused.js
+import React from 'react';
+
+export class Enthused extends React.Component {
+  componentDidMount() {
+    this.interval = setInterval(() => {
+      this.props.addText('!');
+    }, 15);
+  }
+  componentWillUnmount(prevProps, prevState) {
+    clearInterval(this.interval);
+  }
+
+  render() {
+    return (
+      <button onClick={this.props.toggle}>
+        Stop!
+      </button>
+    );
+  }
+}
+
+// App.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Enthused } from './Enthused';
+
+export class App extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      enthused: false,
+      text: ''
+    };
+
+    this.toggleEnthusiasm = this.toggleEnthusiasm.bind(this);
+    this.addText = this.addText.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  toggleEnthusiasm() {
+    this.setState({
+      enthused: !this.state.enthused
+    });
+  }
+
+  setText(text) {
+    this.setState({ text: text });
+  }
+
+  addText(newText) {
+    let text = this.state.text + newText;
+    this.setState({ text: text });
+  }
+
+  handleChange(e) {
+    this.setText(e.target.value);
+  }
+
+  render() {
+    let button;
+    if (this.state.enthused) {
+      button = (
+        <Enthused toggle={this.toggleEnthusiasm} addText={this.addText} />
+      );
+    } else {
+      button = (
+        <button onClick={this.toggleEnthusiasm}>
+          Add Enthusiasm!
+        </button>
+      );
+    }
+
+    return (
+      <div>
+        <h1>Auto-Enthusiasm</h1>
+        <textarea rows="7" cols="40" value={this.state.text}
+                  onChange={this.handleChange}>
+        </textarea>
+        {button}
+        <h2>{this.state.text}</h2>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <App />,
+  document.getElementById('app')
+);
+
+//////////////

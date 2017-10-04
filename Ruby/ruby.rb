@@ -2,9 +2,80 @@ require 'file_name' # includes file
 include ModuleName  # includes instance methods
 extend  ModuleName  # includes class methods
 prepend ModuleName  # includes methods above instance methods
+
+# comment annotation
+# TODO:
+# FIXME:
+# OPTIMIZE:
+# HACK:
+# REVIEW:
+######
+
+###### included
+module Yy
+  require 'rails'
+
+  module Yy
+    extend ActiveSupport::Concern
+
+    included do
+      def self.klass_method
+        puts 'klass_method'
+      end
+
+      def nstns_method
+        puts 'nstns_method'
+      end
+    end
+  end
+
+  class Xx
+    include Yy
+  end
+
+  Xx.new.nstns_method
+  Xx.klass_method
+end
+######
+
+#heredoc
+ActiveRecord::Base.connection.execute(<<-SQL).first['customer_mail']
+SELECT email customer_mail FROM users WHERE admin = 'f' AND id = '#{@user.id}'
+SQL
+######
+
+######
+module_function # turn instance methods to class methods
+
+module SomeModule
+  mudule_function
+
+  def some_method; end
+end
+######
+
+
+# format
+format('one: %s, two: %s', 1, 2) # => "one: 1, two: 2"
+######
+
+
+# float
+325.09 * 100 # => 32508.999999999996
+######
+
+
 ###
-order&.email
-order.try(:email)
+def some_method
+  print 'hello'
+end
+
+def repeat
+  2.times { yield }
+end
+
+repeat &method(:some_method) # convert method to proc
+# => hellohello
 ###
 def xxx(*)
   super(4, 5, 6)
@@ -57,14 +128,18 @@ end
 'ModuleName::KlassName'.split('::').inject(Object) { |par, const| par.const_get(const) } # вернет KlassName
 ######
 (1..3).inject([]) { |arr, n| arr << n}           # => [1, 2, 3]
-(1..3).inject({}) { |hsh, n| hsh.merge(n => 0) } # => { 1 => 0, 2 => 0, 3 => 0 }
+(1..3).inject({}) { |hsh, n| hsh.merge(n => n) } # => { 1 => 1, 2 => 2, 3 => 3 }
+(1..3).inject({}) { |hsh, n| hsh[n] = n; hsh }   # => { 1 => 1, 2 => 2, 3 => 3 }
+######
+[1, 2, 5].inject(10, &:+) # => 18
 ######
 [1, 2, 3].inject { |res, i| res + i } # => 6
 [1, 2, 3].inject(:+) # => 6
 [true, false, true].inject(:&) == false
 [true, true, true].inject(:&)  == true
 ######
-[1, 2, 3].any? { |x| x == 1 } # => true
+[1, 2, 3].any? { |x| x == 1 }        # => true
+(1..10).all? { |number| number < 8 } # => true
 ######
 set = Set.new [1, 'str1', 'str2', 2, 4]
 set.classify { |f| f.class } # => {Fixnum=>#<Set: {1, 2, 4}>, String=>#<Set: {"str1", "str2"}>}
@@ -87,6 +162,18 @@ x.(2)     # => 3
 BigDecimal.new('123.45678901234567890').to_s('3F') # "123.456 789 012 345 678 9"
 ######
 
+## Mimic Method
+def BaseClass(name)
+  name == 'string' ? String : Object
+end
+
+class C < BaseClass 'string'
+  attr_accessor :an_attribute
+end
+######
+
+## Hash
+##############################
 # tap - принимает на вход себя и изменяет
 hash = {
   id:   1,
@@ -100,6 +187,11 @@ hash = { marko: 'polo' }
 hash.fetch(:marko)        # => 'polo'
 hash.fetch(:marko, false) # если hash[:marko] == nil, то вернется false
 ######
+[[1, 2], [3, 4]].to_h # => {1=>2, 3=>4}
+##############################
+
+
+
 # change if something exists
 something &&= something.downcase
 ######
@@ -271,12 +363,55 @@ end
 ##########
 
 
+## Enumerator
+##############################
+e = [1, 2, 3].map                  # => #<Enumerator: [1, 2, 3]:map>
+e.each_with_index { |n, i| n * i } # => [0, 2, 6]
+
+[1, 2, 3].map.with_index { |n, i| n * i } # => [0, 2, 6]
+###########
+letters = %w[a b c d e]
+
+group_1 = letters.reverse_each.group_by.each_with_index do |item, index|
+  index % 3
+end
+
+group_2 = letters.reverse_each.each_with_index.group_by do |item, index|
+  index % 3
+end
+
+p group_1 # => {0=>["e", "b"], 1=>["d", "a"], 2=>["c"]}
+p group_2 # => {0=>[["e", 0], ["b", 3]], 1=>[["d", 1], ["a", 4]], 2=>[["c", 2]]}
+###########
+numbers = [1,2].cycle(1) # => #<Enumerator: [1, 2]:cycle(1)>
+numbers.next             # => 1
+numbers.next             # => 2
+numbers.next             # StopIteration: iteration reached an end
+###########
+numbers = [1,2].cycle(1) # => #<Enumerator: [1, 2]:cycle(1)>
+loop { p numbers.next } # => 1, 2
+###########
+e = [1, 2, 3].each # => #<Enumerator: [1, 2, 3]:each>
+e.next   # => 1
+e.peek   # => 2
+e.next   # => 2
+e.rewind # => #<Enumerator: [1, 2, 3]:each>
+e.next   # => 1
+##############################
+
+
 ## Arrays
 ##############################
 # push or <<   # append
 # pop or shift # remove
 ###########
 Array('firefly') # => ['firefly']
+###########
+[1, 2, 3].count # bad, count iterate all collection
+[1, 2, 3].size  # good
+###########
+[1, 2, 3].reverse.each(:to_s) # bad
+[1, 2, 3].reverse_each(:to_s) # good
 ###########
 [[1, 2, 3], [4, 5, 6]].flatten == [1, 2, 3, 4, 5, 6]
 ###########
@@ -425,6 +560,12 @@ def double (par)
 end
 
 double (2) { |x| puts x * 2 }
+##########
+def doub
+  yield
+end
+
+puts doub { 2 * 2 } # вызываешь метод и передаешь туда параметры
 ###############################
 
 
@@ -609,6 +750,33 @@ puts 'hello'.casecmp 'HeLlo' #сравнивает строки игнориру
   puts last_name
 end
 ###############################
+
+
+### protected
+class C
+  def initialize(number)
+    @number = number
+  end
+
+  def compare(c)
+    if c.number > number
+      puts "The other object's number is bigger."
+    else
+      puts "The other object's number is the same or smaller."
+    end
+  end
+
+  protected
+
+  def number
+    @number
+  end
+end
+
+c1 = C.new(100)
+c2 = C.new(101)
+c1.compare(c2)
+##########
 
 
 # METHAPROGRAMMING
@@ -912,8 +1080,16 @@ str.singleton_methods # => [:title?]
 ##############################
 
 
-### Algorithms
+# reserved words
+# break case catch class const continue debugger default delete do else enum
+# export extends false finally for function if implements import in instanceof
+# interface let new null package private protected public return static super
+# switch this throw true try typeof var void while with yield end
+###
 
+
+### Algorithms
+##############################
 # factorial
 def factorial_recursive(n)
   n == 0 ? 1 : n * factorial_recursive(n - 1)
@@ -928,8 +1104,8 @@ class Integer
     (1..self).inject(:*) || 1
   end
 end
+##########
 
-#
 
 # fibonacci
 def fibonacci_iterative(n)
@@ -939,29 +1115,4 @@ end
 def fibonacci_recursive(n)
   n < 2 ? n : fibonacci_recursive(n - 1) + fibonacci_recursive(n - 2)
 end
-
-### protected
-class C
-  def initialize(number)
-    @number = number
-  end
-
-  def compare(c)
-    if c.number > number
-      puts "The other object's number is bigger."
-    else
-      puts "The other object's number is the same or smaller."
-    end
-  end
-
-  protected
-
-  def number
-    @number
-  end
-end
-
-c1 = C.new(100)
-c2 = C.new(101)
-c1.compare(c2)
-###
+##############################

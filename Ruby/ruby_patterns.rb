@@ -12,7 +12,7 @@
 # Singleton       - Возвращает всегда один и тотже объект
 # State           - Указываем в каком статусе находится объект
 # Builder         - Создаёт объекты класса, относяшиеся к текущему классу (создает внутри него)
-
+# The Null Object - Если должен передаваться объект, но по каким-либо причинам не передался, то ставим заглушку
 ####################################
 
 ######### template method ##########
@@ -456,6 +456,81 @@ class RentalPlan
 
   def self.build_list_of_ranges
     @ranges = [DayRange.build]
+  end
+end
+########
+
+
+
+class JobSite
+  attr_reader :contact
+
+  def initialize(location, contact)
+    @location = location
+    @contact = contact
+  end
+
+  def contact_name
+    if contact
+      contact.name
+    else
+      'no name'
+    end
+  end
+
+  def contact_phone
+    if contact
+      contact.phone
+    else
+      'no phone'
+    end
+  end
+
+  def email_contact(email_body)
+    if contact
+      contact.deliver_personalized_email(email_body)
+    end
+  end
+end
+########
+
+
+
+#### The Null Object pattern - when a contact is missing, rather than leaving
+# @contact unassigned (and therefore nil) and checking for that everywhere,
+# return something that explicitly represents a contact not existing.
+class JobSite
+  attr_reader :contact
+
+  def initialize(location, contact)
+    @location = location
+    @contact = contact || NullContact.new
+  end
+
+  def contact_name
+    contact.name
+  end
+
+  def contact_phone
+    contact.phone
+  end
+
+  def email_contact(email_body)
+    contact.deliver_personalized_email(email_body)
+  end
+end
+
+class NullContact
+  def name
+    'no name'
+  end
+
+  def phone
+    'no phone'
+  end
+
+  def deliver_personalized_email(email)
+    # Intentionally empty. We *want* to do nothing here.
   end
 end
 ########

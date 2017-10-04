@@ -25,7 +25,7 @@ def print_sum do
 end
 
 ////////////////
-IO.puts String.upcase("Elixir")
+IO.puts String.upcase('Elixir')
 
 //or//
 
