@@ -10,6 +10,33 @@ Order.where("json_data ->> 'max_limit' LIKE ?", '10_000')
 
 ###############
 
+###### included
+module Yy
+  require 'rails'
+
+  module Yy
+    extend ActiveSupport::Concern
+
+    included do
+      def self.klass_method
+        puts 'klass_method'
+      end
+
+      def nstns_method
+        puts 'nstns_method'
+      end
+    end
+  end
+
+  class Xx
+    include Yy
+  end
+
+  Xx.new.nstns_method
+  Xx.klass_method
+end
+######
+
 ### validations ###
 
 validates :img_url, allow_blank: true, format: {

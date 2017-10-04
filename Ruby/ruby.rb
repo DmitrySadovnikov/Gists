@@ -11,33 +11,6 @@ prepend ModuleName  # includes methods above instance methods
 # REVIEW:
 ######
 
-###### included
-module Yy
-  require 'rails'
-
-  module Yy
-    extend ActiveSupport::Concern
-
-    included do
-      def self.klass_method
-        puts 'klass_method'
-      end
-
-      def nstns_method
-        puts 'nstns_method'
-      end
-    end
-  end
-
-  class Xx
-    include Yy
-  end
-
-  Xx.new.nstns_method
-  Xx.klass_method
-end
-######
-
 #heredoc
 ActiveRecord::Base.connection.execute(<<-SQL).first['customer_mail']
 SELECT email customer_mail FROM users WHERE admin = 'f' AND id = '#{@user.id}'
