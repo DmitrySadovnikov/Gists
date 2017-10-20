@@ -1,3 +1,17 @@
+###### params
+'ids[]'  = 1
+'ids[]'  = 2
+'q[aaa]' = 123
+'q[bbb]' = 345
+# got {"q"=>{"aaa"=>"123", "bbb"=>"345"}, "ids"=>["1", "2"]}
+# raw ?ids%5B%5D=1&ids%5B%5D=2&q%5Baaa%5D=123&q%5Bbbb%5D=345
+###############
+
+
+# another port
+# ifconfig (get ip)
+# rails server -e development -b xxx.xxx.xxx.xxx -p 3001
+
 ### jsonb ###
 
 # json_data     - json
@@ -9,6 +23,8 @@ Order.where("json_data #> '{state_history, 0}' ->> 'from_state' = 's_assessing' 
 Order.where("json_data ->> 'max_limit' LIKE ?", '10_000')
 
 ###############
+
+User.where('name SIMILAR TO ?', '(va|gi|na)%')
 
 ###### included
 module Yy
@@ -62,6 +78,24 @@ class Order
 end
 
 Order.last.some_method # => 'go to hell'
+
+# override delegate
+class Admin
+  def some_method
+    'go to adminka'
+  end
+end
+
+class Order
+  belongs_to :user
+  delegate   :some_method, to: :user
+
+  def user
+    Admin.first
+  end
+end
+
+Order.last.some_method # => 'go to adminka'
 ###
 
 ###
