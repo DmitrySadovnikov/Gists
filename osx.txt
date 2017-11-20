@@ -1,0 +1,11 @@
+idea
+⌘⌫  to delete the line at caret.
+⌘O  Go to class
+⌘k  Commit
+⌘⇧k Push commit
+
+evernote
+^⌘  New note
+
+translate tab
+^⌥  Translate

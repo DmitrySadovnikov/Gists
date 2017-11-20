@@ -1,2 +1,0 @@
-⌘⌫ to delete the line at caret.
-⌘O Go to class

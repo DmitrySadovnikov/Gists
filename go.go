@@ -1,0 +1,310 @@
+package main
+
+import (
+    "fmt"
+    "os"
+    "time"
+    "errors"
+    "sync"
+)
+
+func main1() {
+    // _args := os.Args // assign var with autotype
+
+    var args []string = os.Args
+    var str string = "Lol"
+
+    fmt.Println(str)
+
+    if len(args) > 1 {
+        fmt.Println(args)
+    } else {
+        fmt.Println("default message")
+    }
+}
+
+// gvm install go1.9.2 --binary
+// gvm use go1.9.2 --default
+
+// go run src/hello/main.go
+// go build src/hello/main.go
+// ./main					                   // execute code
+// gofmt -w src/hello/main.go                  // format code
+// goimports -w src/hello/main.go              // add import
+// go run src/hello/main.go "custom message"
+
+//////////////////////
+
+func main2() {
+    hourOfDay := time.Now().Hour()
+    greeting, err := getGreeting(hourOfDay)
+
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+
+    fmt.Println(greeting)
+}
+
+func getGreeting(hour int) (string, error) {
+    var message string
+
+    if hour < 7 {
+        err := errors.New("too early for greetings")
+        return message, err
+    }
+
+    if hour < 12 {
+        message = "Good Morning"
+    } else if hour < 18 {
+        message = "Good Afternoon"
+    } else {
+        message = "Good Evening"
+    }
+
+    return message, nil
+}
+
+func defaultValues() {
+    var str string
+    fmt.Println(str) // ""
+
+    var digit int
+    fmt.Println(digit) // 0
+
+    var boolean bool
+    fmt.Println(boolean) // false
+
+    var flo float32
+    fmt.Println(flo) // 0.0
+
+    var bit byte
+    fmt.Println(bit) // 0
+}
+
+//////////////////////
+
+// loops
+func main3() {
+    for i := 0; i < 5; i++ {
+        fmt.Println(i)
+    }
+
+    i := 0
+    isLessThenFive := true
+
+    for isLessThenFive {
+        if i >= 5 {
+            isLessThenFive = false
+        }
+
+        if i >= 5 {
+            break
+        }
+
+        fmt.Println(i)
+        i++
+    }
+
+    for {
+        if 1+1 == 2 {
+            break
+        }
+    }
+}
+
+// arrays
+
+func main4() {
+    var langs [3]string
+
+    langs[0] = "Go"
+    langs[1] = "Ruby"
+    langs[2] = "JS"
+
+    fmt.Println(langs)
+}
+
+func main5() {
+    var langs []string // slice array
+
+    langs = append(langs, "Go")
+    langs = append(langs, "Ruby")
+    langs = append(langs, "JS")
+    addToBlockedList(langs)
+}
+
+func addToBlockedList(ips [4]string){}
+
+func main6() {
+    langs := getLangs()
+
+    for i := range langs {
+        fmt.Println(langs[i])
+    }
+    // or
+    for _, element := range langs {
+        fmt.Println(element)
+    }
+}
+
+func getLangs() []string  {
+    langs := []string{"Go", "Ruby", "JS"}
+    return langs
+}
+
+// struct
+
+type gopher struct {
+    name string
+    age  int
+    isAdult bool
+}
+
+func (g gopher) jump() string {
+    if g.age < 65 {
+        return g.name + " can jump HIGH"
+    }
+
+    return g.name + " can still jump"
+}
+
+func  main()  {
+    gopher1 := &gopher{name: "Gopher 1", age: 66}
+    gopher2 := &gopher{name: "Gopher 2", age: 20}
+
+    validateAge(gopher1)
+
+    fmt.Println(gopher1.jump()) // Gopher 1 can still jump
+    fmt.Println(gopher2.jump()) // Gopher 2 can jump HIGH
+    fmt.Println(gopher1)        // &{Gopher 1 66 true}
+    fmt.Println(gopher2)        // {Gopher 2 25 false} false is default value
+
+}
+
+func validateAge(g *gopher) {
+    g.isAdult = g.age >= 12
+}
+
+func getList() []*gopher {
+    gopher1 := &gopher{name: "Gopher 1", age: 66}
+    gopher2 := &gopher{name: "Gopher 2", age: 20}
+
+    list := []*gopher{gopher1, gopher2}
+    return list
+}
+// reference
+
+func main7() {
+    language := "Go"
+    favoriteLang := &language
+
+    language = "Ruby"
+    fmt.Println(language)       // Ruby
+    fmt.Println(favoriteLang)   // 0xc42000e1d0 Ruby
+    fmt.Println(*favoriteLang)  // Ruby
+}
+
+// interface
+
+type jumper interface {
+    jump() string // Все struct имеющие метод jump() являются jumper
+}
+
+type horse struct {
+    name string
+    weight int
+}
+
+type gopher struct {
+    name string
+    age  int
+    isAdult bool
+}
+
+func (g gopher) jump() string {
+    if g.age < 65 {
+        return g.name + " can jump HIGH"
+    }
+
+    return g.name + " can still jump"
+}
+
+func (g horse) jump() string {
+    if g.weight < 2000 {
+        return g.name + " can jump HIGH"
+    }
+
+    return g.name + " can still jump"
+}
+
+func getList() []jumper {
+    gopher1 := &gopher{name: "Gopher 1", age: 66}
+    gopher2 := &gopher{name: "Gopher 2", age: 20}
+    horse1  := &horse{name: "Horse 1", weight: 1233}
+
+    list := []jumper{gopher1, gopher2, horse1}
+    return list
+}
+
+func main() {
+    for _, element := range getList() {
+        fmt.Println(element)
+    }
+}
+
+// reader / writer
+
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+
+type Writer interface {
+    Write(p []byte) (n int, err error)
+}
+
+// packages
+package main
+
+import (
+"fmt"
+"hello/model"
+)
+
+func main() {
+    list := model.GetList() // First letter should be BIG
+    fmt.Print(list)
+}
+
+package model
+
+import (
+"fmt"
+"hello/model"
+)
+
+func GetList() {
+    ...
+}
+
+// concurrency
+
+func main() {
+    names := []string{"A", "B", "C"}
+    var wg sync.WaitGroup
+    wg.Add(len(names))
+
+    for _, name := range names {
+        go printName(name, &wg)
+    }
+
+    wg.Wait()
+}
+
+func printName(name string, wg *sync.WaitGroup) {
+    fmt.Println(name)
+    wg.Done()
+}
+
+// time GOMAXPROCS=1 go run main.go
