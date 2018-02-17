@@ -1,3 +1,12 @@
+// Typecasting
+
+//uint8 a = 5;
+//uint  b = 6;
+//uint8 c = a * b; // throws an error because a * b returns a uint, not uint8:
+//uint8 c = a * uint8(b); // we have to typecast b as a uint8 to make it work:
+//
+//keccak256("aaaac"); //b1f078126895a1424524de5321b339ab00408010b7cf0e6ed451514981e58aa9
+
 pragma solidity ^0.4.0;
 
 
