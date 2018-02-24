@@ -1,6 +1,5 @@
 pragma solidity ^0.4.19;
 
-
 contract ZombieFactory {
 
   event NewZombie(uint zombieId, string name, uint dna);
@@ -9,14 +8,19 @@ contract ZombieFactory {
   uint dnaModulus = 10 ** dnaDigits;
 
   struct Zombie {
-    string name;
-    uint dna;
+  string name;
+  uint dna;
   }
 
   Zombie[] public zombies;
 
-  function _createZombie(string _name, uint _dna) private {
+  mapping (uint => address) public zombieToOwner;
+  mapping (address => uint) ownerZombieCount;
+
+  function _createZombie(string _name, uint _dna) internal {
     uint id = zombies.push(Zombie(_name, _dna)) - 1; // because .push returns array length
+    zombieToOwner[id] = msg.sender;
+    ownerZombieCount[msg.sender]++;
     NewZombie(id, _name, _dna);
   }
 
