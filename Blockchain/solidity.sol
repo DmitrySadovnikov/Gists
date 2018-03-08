@@ -281,3 +281,16 @@ contract Simple {
     o_product = _a * _b;
   }
 }
+
+
+// struct optimization
+contract Simple {
+
+  // use uin32 for less storage data and pack their together
+  struct Zombie {
+  string name;
+  uint   dna;
+  uint32 level;
+  uint32 readyTime;
+  }
+}
