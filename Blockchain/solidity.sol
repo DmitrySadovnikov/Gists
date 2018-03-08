@@ -225,3 +225,59 @@ contract BLT is Sandwich {
 contract NumberInterface {
   function getNum(address _myAddress) public view returns (uint);
 }
+
+
+// named arguments
+contract C {
+  function f(uint key, uint value) public {
+
+  }
+
+  function g() public {
+    f({value : 2, key : 3});
+  }
+}
+////
+
+// call another contract
+contract InfoFeed {
+  function info() public payable returns (uint ret) { return 42; }
+}
+
+contract Consumer {
+  InfoFeed feed;
+  function setFeed(address addr) public { feed = InfoFeed(addr); }
+  function callFeed() public { feed.info.value(10).gas(800)(); }
+}
+
+//
+
+contract D {
+  uint x;
+  function D(uint a) public payable {
+    x = a;
+  }
+}
+
+contract C {
+  D d = new D(arg);
+
+  function createD(uint arg) public {
+    D newD = new D(arg);
+  }
+
+  function createAndEndrowD(uint arg, uint amount) public payable {
+    D newD = D.value(amount)(arg);
+  }
+}
+
+// multiple named return
+
+contract Simple {
+  function arithmetic(uint _a, uint _b)
+  public pure
+  returns (uint o_sum, uint o_prodict) {
+    o_sum = _a + _b;
+    o_product = _a * _b;
+  }
+}

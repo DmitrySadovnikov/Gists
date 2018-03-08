@@ -1,3 +1,9 @@
+# Ruby comment
+/#(.*)$/
+
+# Whitespaces
+(?<=^|\[)\s+|\s+(?=$|\])|(?<=\s)\s+
+
 //modifiers//
 
 '/.../i' // case insensitive (ignore case)
