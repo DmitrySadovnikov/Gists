@@ -41,6 +41,11 @@
 // payable // a special type of function that can receive Ether
 ////
 
+// Event Modifiers
+// anonymous // Does not store event signature as topic
+// indexed   // Stores the parameter as topic
+//
+
 // Function operators
 // memory  // very chip
 // storage // very expensive, because write data to blockchain
@@ -67,6 +72,21 @@
 // randNonce++;
 // uint random2 = uint(keccak256(now, msg.sender, randNonce)) % 100;
 //
+
+
+// multiple inheritance
+// contract SatoshiNakamoto is NickSzabo, HalFinney {
+//   // Omg, the secrets of the universe revealed!
+// }
+
+// SafeMath
+// using SafeMath for uint256;
+//
+// uint256 a = 5;
+// uint256 b = a.add(3); // 5 + 3 = 8
+// uint256 c = a.mul(2); // 5 * 2 = 10
+// uint256 c = a.sub(2); // 5 - 2 = 3
+// uint256 c = a.div(2); // 5 / 2 = 2
 
 
 // examples
