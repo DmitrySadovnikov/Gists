@@ -7,16 +7,39 @@
 //
 // keccak256("aaaac"); //b1f078126895a1424524de5321b339ab00408010b7cf0e6ed451514981e58aa9
 
+//  Global variables
+//  block.blockhash(uint blockNumber) returns (bytes32) // hash of the given block - only works for 256 most recent blocks excluding current
+//  block.coinbase (address)                            // current block miner’s address
+//  block.difficulty (uint)                             // current block difficulty
+//  block.gaslimit (uint)                               // current block gaslimit
+//  block.number (uint)                                 // current block number
+//  block.timestamp (uint)                              // current block timestamp as seconds since unix epoch
+
+//  msg.data (bytes)     // complete calldata
+//  msg.gas (uint)       // remaining gas - deprecated in version 0.4.21 and to be replaced by gasleft()
+//  msg.sender (address) // sender of the message (current call)
+//  msg.sig (bytes4)     // first four bytes of the calldata (i.e. function identifier)
+//  msg.value (uint)     // number of wei sent with the message
+//  now (uint)           // current block timestamp (alias for block.timestamp)
+
+//  gasleft() returns (uint256) // remaining gas
+//  tx.gasprice (uint)          // gas price of the transaction
+//  tx.origin (address)         // sender of the transaction (full call chain)
 
 // Function modifiers
-// public
-// private
-// internal
-// external
-// pure
-// view
-// external view // functions don't cost gas. Note: If a view function is called internally from another function in the same contract that is not a view function, it will still cost gas
+// visibility modifiers
+// private    // means it's only callable from other functions inside the contract
+// internal   // is like private but can also be called by contracts that inherit from this one
+// external   // can only be called outside the contract
+// public     // can be called anywhere, both internally and externally
 
+// state modifiers
+// view // tells us that by running the function, no data will be saved/changed
+// pure // tells us that not only does the function not save any data to the blockchain, but it also doesn't read any data from the blockchain
+// Both of these don't cost any gas to call if they're called externally from outside the contract (but they do cost gas if called internally by another function)
+
+// payable // a special type of function that can receive Ether
+////
 
 // Function operators
 // memory  // very chip
@@ -33,10 +56,18 @@
 //  uint counter = 0;
 //  for (uint i = 1; i <= 10; i++) {
 //    if (i % 2 == 0) {
-//    evens[counter] = i;
-//    counter++;
+//      evens[counter] = i;
+//      counter++;
 //    }
 //  }
+
+// random uints
+// uint randNonce = 0;
+// uint random = uint(keccak256(now, msg.sender, randNonce)) % 100;
+// randNonce++;
+// uint random2 = uint(keccak256(now, msg.sender, randNonce)) % 100;
+//
+
 
 // examples
 
