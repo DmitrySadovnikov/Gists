@@ -89,6 +89,23 @@
 // uint256 c = a.div(2); // 5 / 2 = 2
 
 
+// Assembly
+// function xxx() {
+//   bytes memory sig = new bytes(42);
+//
+//   bytes32 r;
+//   bytes32 s;
+//   uint8   v;
+//
+//   assembly {
+//     r  := mload(add(sig, 32))
+//     s  := mload(add(sig, 64))
+//     v  := byte(0, mload(add(sig, 96)))
+//     let x := 0
+//   }
+// }
+
+
 // examples
 
 pragma solidity ^0.4.0;
