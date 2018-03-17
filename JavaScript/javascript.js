@@ -1,3 +1,120 @@
+//// class
+class Names {
+  constructor (names) {
+    this.names = names;
+  }
+
+  contains(names) {
+    return names.every((name) => this.names.indexOf(name) !== -1);
+  }
+
+  getMessage(message) {
+    var result = '';
+
+    for(var i = 0; i < this.names.length; i++) {
+      result += this.names[i] + ' - ' + message + ', ';
+    }
+
+    return result;
+  }
+}
+
+var countries = new Names(['UK', 'Italy', 'Germany', 'France']);
+countries.contains(['UK', 'Germany']); // => true
+countries.contains(['USA', 'Italy']);  // => false
+countries.getMessage('country'); // UK - country, Italy - country, Germany - country, France - country,
+////
+
+//// 1 Function declaration: starts with "function"
+function isNil(value) {
+  return value == null;
+}
+////
+
+//// 2 Function expression: starts with "var"
+var isTruthy = function(value) {
+  return !!value;
+};
+
+//// Function expression (IIFE): starts with "("
+(function messageFunction(message) {
+  return message + ' World!';
+})('Hello');
+////
+
+//// 3 Shorthand method definition
+var collection = {
+  items: [],
+  add(...items) { this.items.push(...items) },
+  get(index)    { return this.items[index] }
+};
+
+collection.add('C', 'Java', 'PHP');
+console.log(collection.get(1)); // => 'Java'
+
+//// 3.1 Computed property names and methods (Metaprogramming)
+var addMethod = 'add',
+    getMethod = 'get';
+
+var collection = {
+  items: [],
+  [addMethod](...items) { this.items.push(...items) },
+  [getMethod](index)    { return this.items[index] }
+};
+
+collection[addMethod]('C', 'Java', 'PHP');
+collection[getMethod](1) // => 'Java'
+////
+
+//// 4 Arrow function
+var absValue = (number) => {
+  if (number < 0) { return -number }
+  return number;
+}
+absValue(-10); // => 10
+absValue(5);   // => 5
+////
+
+//// 5. Generator function
+// a. Function declaration form function* <name>():
+function* indexGenerator(){
+  var index = 0;
+  while(true) {
+    yield index++;
+  }
+}
+var g = indexGenerator();
+console.log(g.next().value); // => 0
+console.log(g.next().value); // => 1
+
+// b. Function expression form function* ():
+var indexGenerator = function* () {
+  var index = 0;
+  while(true) {
+    yield index++;
+  }
+};
+
+// c. Shorthand method definition form *<name>():
+var obj = {
+  *indexGenerator() {
+    var index = 0;
+    while(true) {
+      yield index++;
+    }
+  }
+}
+////
+
+//// new Function (Metaprogramming)
+var numberA = 'numberA',
+    numberB = 'numberB';
+
+var sumFunction = new Function(numberA, numberB, 'return numberA + numberB');
+sumFunction(10, 15) // => 25
+////
+
+
 /// AJAX ///
 var btn = document.getElementById("btn");
 
@@ -47,6 +164,9 @@ arr = []
 prompt('What is you nane')     // ask user
 confirm("I am ready to play!") // yes no
 "Batman".substring(0, 3)       // Bat
+[1, false, 5].filter(function(item) { return typeof item === 'number' }) // => [ 1, 5 ]
+[1, 5, 10, 0].some(item => item === 0); // => true
+
 ///
 typeof someObject;      // should print "object"
 typeof 43;              // should print "number"
