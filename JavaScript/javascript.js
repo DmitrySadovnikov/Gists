@@ -24,6 +24,12 @@ countries.contains(['UK', 'Germany']); // => true
 countries.contains(['USA', 'Italy']);  // => false
 countries.getMessage('country'); // UK - country, Italy - country, Germany - country, France - country,
 ////
+function Person(firstName, lastName){
+  // constructor
+  this.firstName = firstName;
+  this.lastName  = lastName;
+}
+////
 
 //// 1 Function declaration: starts with "function"
 function isNil(value) {
@@ -115,42 +121,17 @@ sumFunction(10, 15) // => 25
 ////
 
 
-/// AJAX ///
-var btn = document.getElementById("btn");
-
-btn.addEventListener("click", function () {
-    var ourRequest = new XMLHttpRequest();
-    ourRequest.open('GET', 'https://randomword.setgetgo.com/get.php');
-    ourRequest.onload  = function () {
-        if (ourRequest.status >= 200 && ourRequest.status < 400) {
-            var ourData = JSON.parse(ourRequest.responseText);
-            renderHTML(ourData);
-        } else {
-            console.log("Server Error");
-        }
-        document.getElementById('word').innerHTML               = ourData;
-        document.getElementsByClassName('background').innerHTML = "https://source.unsplash.com/category/buildings/1600x900";
-    };
-    ourRequest.onerror = function () {
-        console.log("Connection error");
-    };
-    ourRequest.send();
-});
-
-////set timeout / interval /////
-setInterval(function () {
-    alert("прошла секунда")
-}, 1000)
-// => прошла секунда
-// => прошла секунда
-setTimeout(function () {
-    alert("World")
-}, 1000)
-alert("Hello")
-// => Hello асинхронность!
-// => World
-////////////////////////
-
+//// Comparison
+  [10] ==   10    // is true
+  [10] ===  10    // is false
+  '10' ==   10    // is true
+  '10' ===  10    // is false
+  []   ==   0     // is true
+  []   ===  0     // is false
+  ''   ==   false // is true but true == "a" is false
+  ''   ===  false // is false
+  undefined, null, 0, false, NaN, '' // = false
+////
 
 
 // Arrays
@@ -168,13 +149,38 @@ confirm("I am ready to play!") // yes no
 [1, 5, 10, 0].some(item => item === 0); // => true
 
 ///
-typeof someObject;      // should print "object"
-typeof 43;              // should print "number"
-typeof 'aString';       // should print "string"
-typeof Object.prototype // object
+typeof someObject;      // => "object"
+typeof 43;              // => "number"
+typeof 'aString';       // => "string"
+typeof Object.prototype // => "object"
+
+var arr = ["a", "b", "c"];
+typeof arr;                // => "object"
+arr instanceof Array       // => true
+
 ///
 myObj.hasOwnProperty('name') // true or false
 Object.prototype.hasOwnProperty('hasOwnProperty')
+
+2.443242342.toFixed(4);                    // => 2.4432
+(0.1 + 0.2) === 0.3                        // => false
+(0.1 + 0.2).toFixed(1) === 0.3.toFixed(1); // => true
+
+var from = 2;
+[1,2,3,4,5].splice(from, 2) // => [ 3, 4 ]
+
+'AAA'.toLowerCase();
+'aaa'.toUpperCase();
+"js - is lang".replace(/js/gi, 'JavaScript');            // => JavaScript is lang
+' \r   \n   the string be with you   \v \f     '.trim()  // => the string be with you
+'Super Powerful Slicing Ability'.charAt(0);              // => S
+'50 plus 50 equals 100!'.match(/\d+/g);                  // => ["50", "50", "100"]
+'one'.concat('two', 'three', 'four');                    // => onetwothreefour
+'supercalifragilisticexpialidocious'.substr(0, 5)        // => super
+'a.b'.split('.')                                         // => ["a", "b"]
+new String('Jumping Jack Flash').valueOf();              // => Jumping Jack Flash
+'The Force Is With Us!'.slice(0, 19)                     // => The Force Is With U
+'gmail@google.com'.indexOf('@');                         //=> 5
 /////////
 
 
@@ -281,7 +287,6 @@ buddy.bark();
 /////////
 
 
-
 // inheritance
 function Animal(name, numLegs) {
     this.name    = name;
@@ -361,3 +366,57 @@ var james = {
 james.speak("great"); // => Hello, I am feeling great
 james.sayJob();       // => "Hi, I work as a programmer"
 //////
+
+
+//// Self-calling Function
+(function(){
+  // some private code that will be executed automatically
+})();
+(function(a, b){
+  var result = a + b;
+  return result;
+})(10,20)
+////
+
+
+//// Get a random item from an array\
+var items = [12, 548 , 'a' , 2 , 5478 , 'foo' , 8852, 'Doe' , 2145 , 119];
+items[Math.floor(Math.random() * items.length)];
+////
+
+
+/// AJAX ///
+var btn = document.getElementById("btn");
+
+btn.addEventListener("click", function () {
+  var ourRequest = new XMLHttpRequest();
+  ourRequest.open('GET', 'https://randomword.setgetgo.com/get.php');
+  ourRequest.onload  = function () {
+    if (ourRequest.status >= 200 && ourRequest.status < 400) {
+      var ourData = JSON.parse(ourRequest.responseText);
+      renderHTML(ourData);
+    } else {
+      console.log("Server Error");
+    }
+    document.getElementById('word').innerHTML               = ourData;
+    document.getElementsByClassName('background').innerHTML = "https://source.unsplash.com/category/buildings/1600x900";
+  };
+  ourRequest.onerror = function () {
+    console.log("Connection error");
+  };
+  ourRequest.send();
+});
+
+////set timeout / interval /////
+setInterval(function () {
+  alert("прошла секунда")
+}, 1000)
+// => прошла секунда
+// => прошла секунда
+setTimeout(function () {
+  alert("World")
+}, 1000)
+alert("Hello")
+// => Hello асинхронность!
+// => World
+////////////////////////
