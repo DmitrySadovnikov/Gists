@@ -7,3 +7,9 @@ mix ecto.create # create database
 mix phoenix.server
 
 mix deps.get # install libruaries
+
+iex -S mix # phoenix console
+
+# debug
+require IEx
+IEx.pry

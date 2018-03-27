@@ -51,6 +51,17 @@ scripts: {
 
 
 
+
+
+
+//
+export default class Filter extends React.PureComponent {
+}
+
+
+
+
+
 /// module export
 
 var NavBar     = require('./NavBar'); // main file
