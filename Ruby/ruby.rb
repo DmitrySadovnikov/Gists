@@ -73,8 +73,14 @@ def x(*)
 end
 x(10) # => 10
 ###
-/sera/ === 'coursera' && 'coursera' === 'coursera' && Integer === 21 # сравнивает объект и класс
-[9, 3, 4, 9, 5].count(9) # => 2
+/sera/     === 'coursera' # => true
+'coursera' === 'coursera' # => true
+Integer    === 21         # => true сравнивает объект и класс
+(1..5)     === 3          # => true
+(1..5)     === 6          # => false
+###
+[9, 3, 4, 9, 5].count(9)  # => 2
+######
 
 ##
 a =  [:foo] * 4  # => [:foo, :foo, :foo, :foo]

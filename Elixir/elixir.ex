@@ -61,6 +61,43 @@ a = 99
 ####
 
 
+## TypeCheck functions
+is_atom/1
+is_binary/1
+is_bitstring/1
+is_boolean/1
+is_float/1
+is_function/1
+is_function/2
+is_integer/1
+is_list/1
+is_map/1
+is_ni1/1
+is_number/1
+is_pid/1
+is_port/1
+is_reference/1
+is_tuple/1
+
+## Additional functions
+abs(number)
+binary_part(binary, start, length)
+bit_size(bitstring)
+byte_size(bitstring)
+div(integer, integer)
+elem(tuple, n)
+hd(list)
+length(list)
+map_size(map)
+node()
+node(pid | ref | port)
+rem(integer, integer)
+round(number)
+self()
+tl(list)
+trunc(number)
+tuple_size(tuple)
+
 ## Types
 ## Atoms
 # :fred​ ​:is_binary?​ ​:var@2​  ​:<>​  ​:===​  ​:"func/3"​ :"long john silver"​
@@ -88,8 +125,9 @@ languages = List.insert_at(languages, 0, 'C++')
 
 ## Maps
 my_map = %{{:x, :y} => [1, 2, 3], 1 => {'a', 'b', 'c'}, :a => '123', 'b' => 123}
-my_map.a    # => '123'
-my_map['b'] # => 123
+my_map.a        # => '123'
+my_map['b']     # => 123
+elem(my_map, 2) # => '123'
 
 map       = %{:digits => [1, 2, 3]}  # => %{digits: [1, 2, 3]}
 other_map = %{:digits => list} = map # => %{digits: [1, 2, 3]}
@@ -184,8 +222,69 @@ Integer.is_even(5) # => false
 
 ###
 
+## functions
+defmodule Sample.Enum do
+  def first([]), do: nil
+  def first([head | _]) do
+    head
+  end
 
-##
+  def some_func(quantity, {_, _, price}) do
+    quantity * price
+  end
+  def some_func(quantity, book) do
+    quantity * elem(book, 2)
+  end
+end
+
+Sample.Enum.first([1, 2, 3]) # => 1
+## Operators
+[1, 2, 3] ++ [4, 5, 6] # => [1, 2, 3, 4, 5, 6]
+[1, 2, 3, 2] -- [2]    # => [1, 3, 2]
+"foo" <> "bar"         # => "foobar"
+1 == 1.0               # => true
+1 === 1.0              # => false
+###
+
+
+# Guard Clauses
+def first(list) when length(list) == 0, do: nil # if list length == 0, else:
+def first([head | _]), do: head
+###
+
+# Default parameters
+def first([], val \\ nil), do: val
+def add(list, val \\ 0), do: [val | list]
+
+# private functions
+  defp some_function, do: nil
+
+# Functions as First-class citizens
+list = [1, 2, 3, 4]
+Enum.map(list, &Sample.Utils.square/1)    # => [1, 4, 9, 16]
+Enum.reduce(list, 0, &Sample.Utils.sum/2) # => 10
+
+# Anonymous functions
+Enum.map(list, fn(x) -> x * x end)              # => [1, 4, 9, 16]
+Enum.reduce(list, 0, fn(x, acc) -> acc + x end) # => 10
+
+Enum.map(list, &(&1 * &1))       # => [1, 4, 9, 16]
+Enum.reduce(list, 0, &(&1 + &2)) # => 10
+
+#
+defmodule Sample.Utils do
+  def square(a), do: a * a
+  def sum(a, b), do: a + b
+  def custom_func(a, f) do
+    f.(a)
+  end
+end
+
+Sample.Utils.custom_func(1, fn(x) -> IO.puts(x) end) # => 1
+#
+
+
+###!!###
 defmodule Account do
   def balance(initial, spending) do
     discount(initial, 10) |> interest(0.1) #discount(initial, 10) |> interest(..., 0.1)
