@@ -1,0 +1,13 @@
+kubectl get jobs -n namespace
+
+jobs=(
+  namespace-123-cron-123-1521723000
+  namespace-123-cron-123-1521723300
+)
+
+for item in ${jobs[*]}
+do
+  echo "${item}"
+  kubectl delete job -n nasa "${item}"  --grace-period=0 --force
+  echo ""
+done

@@ -1,3 +1,6 @@
+# brew update
+# brew install elixir
+
 # iex
 
 # h(Enum)
@@ -32,6 +35,13 @@
 # v/0            - retrieves the last value from the history
 # v/1            - retrieves the nth value from the history
 
+##
+10 / 5      # => 2.0 float
+div(10, 5)  # => 2   integer
+0xFF        # => 255
+0xFF + 0x02 # => 257
+##
+
 # parallel map
 def pmap(collection, func) do
   collection
@@ -47,13 +57,43 @@ a = 99
 ####
 [4 | [1, 2, 3]] # => [4, 3, 2, 1]
 ####
+{a, b, c} = {1, 2, 3}
+####
 
 
 ## Types
-## Atom
-:fred​  ​:is_binary?​  ​:var@2​  ​:<>​  ​:===​  ​:"func/3"​, :"long john silver"​
-##
+## Atoms
+# :fred​ ​:is_binary?​ ​:var@2​  ​:<>​  ​:===​  ​:"func/3"​ :"long john silver"​
+# :nil
+# :true
+# :false
+# true == :true # => true
 
+# String
+"Test #{[1, 2, 3]}" # => <<84, 101, 115, 116, 32, 1, 2, 3>>
+
+## Lists
+[a, b, c, d] = [1 | [2 | [3, 4]]] # => [1, 2, 3, 4]
+options = [{:success, true}, {:fail, false}] # => [success: true, fail: false]
+options[:success]                            # => true
+
+Enum.at([:a, :b, :c, :d], 2)     # => :c
+Enum.fetch([:a, :b, :c, :d], 2)  # =>{ :ok, :c }
+Enum.fetch!([:a, :b, :c, :d], 2) # => { :ok, :c }
+#
+languages = ['Elixir', 'Java', 'Ruby']
+List.insert_at(languages, 0, 'C++')
+languages # => ['Elixir', 'Java', 'Ruby'] # elixir is immutable, we need to rebind variable
+languages = List.insert_at(languages, 0, 'C++')
+
+## Maps
+my_map = %{{:x, :y} => [1, 2, 3], 1 => {'a', 'b', 'c'}, :a => '123', 'b' => 123}
+my_map.a    # => '123'
+my_map['b'] # => 123
+
+map       = %{:digits => [1, 2, 3]}  # => %{digits: [1, 2, 3]}
+other_map = %{:digits => list} = map # => %{digits: [1, 2, 3]}
+list                                 # => [1, 2, 3]
 ## Range
 1..5
 ##
@@ -62,15 +102,90 @@ a = 99
 ~r{regexp}
 ~r/…/
 
-Regex.run ​~​r{[aeiou]}, ​"​​caterpillar"​          # => ["a"]                                    ​ 
-Regex.scan ​~​r{[aeiou]}, ​"​​caterpillar"​         # => [["a"], ["e"], ["i"], ["a"]]                                                                                                        ​ 
-Regex.split ​~​r{[aeiou]}, ​"​​caterpillar"​        # => ["c", "t", "rp", "ll", "r"]
-Regex.replace ​~​r{[aeiou]}, ​"​​caterpillar"​, ​"​​*"​ # => "c​*​t​*​rp​*​ll​*​r
+Regex.run ~r{[aeiou]}, "caterpillar"          # => ["a"]                                    ​ 
+Regex.scan ~r{[aeiou]}, "caterpillar"​         # => [["a"], ["e"], ["i"], ["a"]]                                                                                                        ​ 
+Regex.split ~r{[aeiou]}, "caterpillar"​        # => ["c", "t", "rp", "ll", "r"]
+Regex.replace ~r{[aeiou]}, "caterpillar", "*" # => "c​*​t​*​rp​*​ll​*​r
+##
+
+## Tuple
+xxx = {'one', :two, 3}
+elem(xxx, 0)                    # => "one"
+yyy = put_elem(xxx, 2, 'three') # => {'one', :two, 'three'}
+xxx                             # => {'one', :two, 3}
+
+{status, result} = File.open("") #=> {:error, :enoent}
+{status, result} = File.open("/shit.json") #=> {:ok, #PID<0.267.0>}
+status # => :ok
 ##
 
 
 ####
+# iex "module_playground.ex" => run file
+# r("module_playground.ex")  => reload ModulePlayground module
+# import_file("module_playground.ex")
+#
+defmodule ModulePlayground do
+  def say_here do
+    IO.puts("I am here")
+  end
+end
 
+defmodule ModulePlayground do
+  import IO, only: [puts: 1]
+  import Kernel, except: [inspect: 1] # because we override this method
+
+  def say_here do
+    inspect "I am here" # without module
+  end
+
+  def inspect(param1) do
+    puts param1
+  end
+end
+
+ModulePlayground.say_here
+
+# aliases
+defmodule ModulePlayground do
+  def print_sum do
+    ModulePlayground.Misc.Util.Math.add(1, 2)
+  end
+end
+
+defmodule ModulePlayground do
+  alias ModulePlayground.Misc.Util.Math
+
+  def print_sum do
+    Math.add(1, 2)
+  end
+end
+
+defmodule ModulePlayground do
+  alias ModulePlayground.Misc.Util.Math, as: MyMath
+
+  def print_sum do
+    MyMath.add(1, 2)
+  end
+end
+
+# require
+defmodule ModulePlayground do
+  require Integer # allow to use macros
+
+  def even?(arg) do
+    Integer.is_even(arg)
+  end
+end
+
+# Macros
+# Numbers
+Integer.is_even(5) # => false
+
+###
+
+
+##
 defmodule Account do
   def balance(initial, spending) do
     discount(initial, 10) |> interest(0.1) #discount(initial, 10) |> interest(..., 0.1)
@@ -121,7 +236,7 @@ defmodule Person do
     last = Enum.at(parts, 1)
     "#{String.upcase(last)}, #{first}"
   end
-end 
+end
 
 IO.puts Person.format_name("José Valim")
 ########################
