@@ -1,5 +1,19 @@
 # brew update
 # brew install elixir
+# \curl -sSL https://raw.githubusercontent.com/taylor/kiex/master/install | bash -s
+# vi ~/.zshrc add:
+# test -s "$HOME/.kiex/scripts/kiex" && source "$HOME/.kiex/scripts/kiex"
+# kiex list
+# kiex install 1.4
+# mix deps.get -> bundle install
+# iex -S mix   -> rails s
+# iex -S mix phoenix.server
+
+# Install dependencies with mix deps.get
+# Create and migrate your database with mix ecto.create && mix ecto.migrate
+# Install Node.js dependencies with npm install
+# Start Phoenix endpoint with mix phoenix.server
+# Now you can visit localhost:4000 from your browser.
 
 # iex
 
@@ -60,6 +74,102 @@ a = 99
 {a, b, c} = {1, 2, 3}
 ####
 
+###
+Macro.to_string(12) # => "12"
+###
+
+## Metaprogramming
+# quoting
+quote do: sum(1, 2 + 3, 4) # => {:sum, [], [1, {:+, [context: Elixir, import: Kernel], [2, 3]}, 4]}
+# :sum         # => Atoms
+# 1.0          # => Numbers
+# [1, 2]       # => Lists
+# "strings"    # => Strings
+# {key, value} # => Tuples with two elements
+
+quote do: %{1 => 2, 2 => 3, 3 => 4} # => {:%{}, [], [{1, 2}, {2, 3}, {3, 4}]}
+#
+
+# Unquoting
+#Macro.to_string(quote do: 11 + unquote(13)) # => "11 + 13"
+
+# Escaping
+map = %{hello: :world}
+Macro.escape(map) # => {:%{}, [], [hello: :world]}
+##
+
+# if/else
+if(length(list) == 0) do
+  nil
+else
+  hd(list)
+end
+#
+unless(length(list) == 0) do
+  hd(list)
+end
+#
+if true, do: 1, else: 2
+if(length(list) == 0, do: nil, else: hd(list))
+##
+
+# cond
+cond do
+     day == :Monday  -> "M"
+     day == :Tuesday -> "Tu"
+     true            -> "Invalid day"
+     end
+##
+
+# pm
+ def some_day(:Monday),  do: 'M'
+ def some_day(:Tuesday), do: 'Tu'
+ def some_day(_),        do: 'Invalid day'
+#
+
+# case
+case day do
+         :Monday  -> "M"
+         :Tuesday -> "Tu"
+         _        -> "Invalid day"
+         end
+
+case day do
+         {1, _, _}                      -> "Brand new month"
+         {25, 12, _}                    -> "Marry Cristmas"
+         {_, month, _} when month <= 12 -> "Just day"
+         {_, _, _}                      -> "Invalid month"
+         end
+##
+
+# recursion
+def map([], _), do: []
+def map([hd | tl], f), do: [f.(hd) | map(tl, f)]
+#
+def lyrics(), do: lyrics(100..1)
+def lyrics(first..last) when first <= last, do: get_sentence(first)
+def lyrics(first..last), do: get_sentence(first) <> lyrics(first - 1..last)
+#
+import Kernel, except: [length: 1]
+
+def length([]), do: 0
+def length([_ | tail]), do: 1 + length(tail)
+# tail resursion
+def other_length([_ | tail]),      do: other_length(tail, 1)
+def other_length([], len),         do: len
+def other_length([_ | tail], len), do: other_length(tail, len + 1)
+##
+def reverse(l), do: reverse(1, [])
+def reverse([], reversed), do: reversed
+def reverse([head | tail], reversed), do: reverse(tail, [head reversed])
+
+
+def other_map([head | tail], f),         do: other_map(tail, f, [f.(head)])
+def other_map([], _, result),            do: reverse(result)
+def other_map([head | tail], f, result), do: other_map(tail, f, [f.(head) | result])
+
+Xxx.other_map([1, 2, 3], &(&1 * 2)) # => [6, 4, 2]
+##
 
 ## TypeCheck functions
 is_atom/1
@@ -279,7 +389,7 @@ defmodule Sample.Utils do
     f.(a)
   end
 end
-
+Any chance you can do it it’s just a technical conversation for this week
 Sample.Utils.custom_func(1, fn(x) -> IO.puts(x) end) # => 1
 #
 

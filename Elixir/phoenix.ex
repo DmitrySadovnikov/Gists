@@ -13,3 +13,8 @@ iex -S mix # phoenix console
 # debug
 require IEx
 IEx.pry
+
+
+# get all instances
+MyApp.Repo.all(MyApp.Model)
+MyApp.Repo.one(from x in MyApp.Model, order_by: [desc: x.id], limit: 1)

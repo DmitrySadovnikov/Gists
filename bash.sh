@@ -89,3 +89,9 @@ do
   echo ""
 done
 ###
+
+## rm by pattern matching
+rm -rf -- \
+  *" "*[0-9]*/ \   # this one gets directories with spaces before numbers...
+  *[0-9]*" "*/
+###
