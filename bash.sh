@@ -1,3 +1,11 @@
+sudo lsof -i tcp:5432
+sudo kill -9 60654
+ps aux | grep postgres
+
+brew services start rabbitmq
+brew services restart rabbitmq
+brew services stop rabbitmq
+
 pwd #current location
 cd ..                   #step back
 cd ../feb               #step back and go to folder
