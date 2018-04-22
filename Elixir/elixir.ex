@@ -258,8 +258,8 @@ list                                 # => [1, 2, 3]
 ~r/…/
 
 Regex.run ~r{[aeiou]}, "caterpillar"          # => ["a"]                                    ​ 
-Regex.scan ~r{[aeiou]}, "caterpillar"​         # => [["a"], ["e"], ["i"], ["a"]]                                                                                                        ​ 
-Regex.split ~r{[aeiou]}, "caterpillar"​        # => ["c", "t", "rp", "ll", "r"]
+Regex.scan ~r{[aeiou]}, "caterpillar"         # => [["a"], ["e"], ["i"], ["a"]]                                                                                                        ​ 
+Regex.split ~r{[aeiou]}, "caterpillar"        # => ["c", "t", "rp", "ll", "r"]
 Regex.replace ~r{[aeiou]}, "caterpillar", "*" # => "c​*​t​*​rp​*​ll​*​r
 ##
 
@@ -396,10 +396,9 @@ defmodule Sample.Utils do
     f.(a)
   end
 end
-Any chance you can do it it’s just a technical conversation for this week
+
 Sample.Utils.custom_func(1, fn(x) -> IO.puts(x) end) # => 1
 #
-
 
 ###!!###
 defmodule Account do
@@ -429,17 +428,11 @@ def print_sum do
 end
 
 ################
-IO.puts String.upcase('Elixir')
-
-##or##
-
-"Elixir"
-|> String.upcase
-|> IO.puts
+String.capitalize("name") # => Name
+String.upcase("Elixir")   # => ELIXIR
 ################
 
-
-#################
+########################
 defmodule Person do
   def format_name(full_name) do
     full_name
@@ -457,19 +450,14 @@ end
 IO.puts Person.format_name("José Valim")
 ########################
 
-####
-name     = "​​elixir"​
-cap_name = String.capitalize(name)
-IO.puts cap_name # => ​​ELIXIR
-IO.puts name     # => ​​elixir
-​####
+########################
 last_name = "Valim"
 IO.puts last_name
 
 "Jose " <> last_name = "Jose Valim"
 IO.puts last_name
 
-data = ['Elixir', 'Jose']
+data = ["Elixir", "Jose"]
 [a, b] = data
 
 IO.puts "#{a}, #{b}" ##Elixir, Jose
@@ -480,6 +468,7 @@ defmodule Account do
       balance + amount
     else
       balance - amount
+    end
   end
 end
 
@@ -497,3 +486,204 @@ defmodule Account do
   end
 end
 ####################
+
+
+# book ->
+#### List (Array) ####
+[1, 2] ++ [3, 4]                         # => [1, 2, 3, 4]
+[1, 2, 3, 4] -- [3, 4]                   # => [1, 2]
+1 in [1, 2, 3]                           # => true
+
+List.foldl([1,2,3], "", &"#{&1}(#{&2})") # => "3(2(1()))"
+List.foldr([1,2,3], "", &"#{&1}(#{&2})") # => "1(2(3()))"
+
+List.flatten([[[1], 2], [[3]]])          # => [1, 2, 3]
+List.replace_at([1,2,3], 2, "three")     # => [1, 2, "three"]
+
+kw = [{:key1, "val1"}, {:key2, "val2"}]
+List.keyfind(kw, "val1", 1)                   # => {:key1, "val1"}
+List.keydelete(kw, "val1", 1)                 # => [key2: "val2"]
+List.keyreplace(kw, "val1", 1, {:xxx, "XXX"}) # => [xxx: "XXX", key2: "val2"]
+########
+
+#### Maps ####
+map = %{name: "Dave", likes: "Programming", where: "Dallas"}
+Map.keys map   # => [:likes, :name, :where]
+Map.values map # => ["Programming", "Dave", "Dallas"]
+
+Map.has_key? map, :name # => true
+
+map.name   # => "Dave"
+map[:name] # => "Dave"
+
+Map.drop map, [:where, :likes]   # => %{name: "Dave"}
+Map.put map, :also_likes, "Ruby" # => %{also_likes: "Ruby", likes: "Programming", name: "Dave", where: "Dallas"}
+
+Map.equal? map, %{} # => false
+Map.pop map, :likes # => {"Programming", %{name: "Dave", where: "Dallas"}}
+########
+
+#### Binaries ####
+bin = <<1, 2>> # => << 1, 2 >>
+byte_size bin  # => 2
+
+bin = <<3 :: size(2), 5 :: size(4), 1 :: size(2)>> # => <<213>>
+:io.format("~-8.2b~n", :binary.bin_to_list(bin))   # => 11010101
+byte_size bin                                      # => 1
+<<1, 2>> <> <<3, 4>>                               # => <<1, 2, 3, 4>>
+########
+
+#### Dates and Times ####
+# date
+{:ok, d1} = Date.new(2018, 12, 25) # => {:ok, ~D[2018-12-25]}
+Date.day_of_week(d1)               # => 2
+Date.add(d1, 7)                    # => ~D[2019-01-01]
+inspect d1, structs: false         # => "%{__struct__: Date, calendar: Calendar.ISO, day: 25, month: 12, year: 2018}"
+
+# range
+first_half = Date.range(~D[2018-01-01], ~D[2018-06-30]) # => #DateRange<~D[2018-01-01], ~D[2018-06-30]>
+Enum.count(first_half)                                  # => 181
+~D[2018-03-15] in first_half                            # => true
+
+# time
+{:ok, t1} = Time.new(12, 34, 56) # => {:ok, ~T[12:34:56]}
+t2 = ~T[12:34:56.78]             # => ~T[12:34:56.78]
+t1 == t2                         # => false
+Time.add(t1, 3600)               # => ~T[13:34:56.000000]
+Time.add(t1, 3600, :millisecond) # => ~T[12:34:59.600000]
+########
+
+#### with ####
+lp = with {:ok, file}   = File.open("fuck.json"),
+          content       = IO.read(file, :all),
+          :ok           = File.close(file),
+          [_, uid, gid] = Regex.run(~r/^_lp:.*?:(\d+):(\d+)/, content)
+  do
+    "Group: #{gid}, User: #{uid}"
+  end
+IO.puts lp      # => Group: 26, User: 26
+IO.puts content # => Some content
+#
+with [a|_] <- [1, 2, 3], do: a # => 1
+with [a|_] <- nil,       do: a # => nil
+#
+mean = with count = Enum.count(values),
+            sum   = Enum.sum(values)
+       do
+         sum/count
+       end
+#
+mean = with(
+  count = Enum.count(values),
+  sum = Enum.sum(values)
+    do
+    sum / count
+  end
+)
+#
+mean = with count = Enum.count(values),
+            sum   = Enum.sum(values),
+       do: sum / count
+########
+
+
+#### anonymous function ####
+sum = fn (a, b) -> a + b end # => #Function<12.99386804/2 in :erl_eval.expr/5>
+sum.(1, 2)                   # => 3
+#
+handle_open = fn
+  {:ok, file} -> "File line: #{IO.read(file, :line)}"
+  {_, error}  -> "Error: #{:file.format_error(error)}"
+end
+IO.puts handle_open.(File.open("some_path"))
+# function returns function
+fun1 = fn -> fn -> "Hello" end end
+fun1.().() # => "Hello"
+# function as argument
+times_2 = fn n -> n * 2 end
+apply   = fn(fun, value) -> fun.(value) end
+apply.(times_2, 6) # => 12
+#
+Enum.map [1, 2, 3], fn e -> e * 2 end # => [2, 4, 6]
+#
+fn
+  (^name) -> "#{greeting} #{name}"
+  (_)     -> "I don't know you"
+end
+########
+
+#### The & Notation
+add_one = &(&1 + 1) # same as fn(n) -> n + 1 end
+add_one.(44)        # => 45
+
+speak = &(IO.puts(&1))
+speak.("Hello") # => Hello
+
+rnd = &(Float.round(&1, &2)) # => &Float.round/2
+rnd.(2.22222222, 2)          # => 2.22
+
+direm = &{div(&1, &2), rem(&1, &2)}
+direm.(13, 5) # => {2, 3}
+
+s = &"bacon and #{&1}"
+s.("custard") # => "bacon and custard"
+
+match_end = &~r/.*#{&1}$/
+"cat" =~ match_end.("t") # => true
+"cat" =~ match_end.("!") # => false
+
+l = &length/1    # => &:erlang.length/1
+l.([1, 2, 3, 4]) # => 4
+
+m = &Kernel.min/2 # => &:erlang.min/2
+m.(99, 88)        # => 88
+
+Enum.map [1, 2, 3, 4], &(&1 + 1) # => [2, 3, 4, 5]
+########
+
+#### Guards ####
+defmodule Guard do
+  def what_is(x) when is_number(x) do
+    IO.puts "#{x} is a number"
+  end
+  def what_is(x) when is_list(x) do
+    IO.puts "#{inspect(x)} is a list"
+  end
+  def what_is(x) when is_atom(x) do
+    IO.puts "#{x} is a atom"
+  end
+end
+Guard.what_is([1, 2, 3]) # => [1, 2, 3] is a list
+#
+defmodule Factorial do
+  def of(0), do: 1
+  def of(n) when(is_integer(n) and n > 0), do: n * of(n - 1)
+end
+########
+
+#### Module Attributes ####
+defmodule Example do
+  @author "Dave Thomas"
+  def get_author do
+    @author
+  end
+end
+########
+
+#### Calling a Function from Erlang Libruary ####
+:io.format("The number is ~3.1f~n", [5.678]) # The number is 5.7
+########
+
+#### Head and Tail ####
+defmodule MyList do
+  def square([]), do: []
+  def square([head | tail]), do: [head * head | square(tail)]
+
+  def reduce([], value, _), do: value
+  def reduce([head | tail], value, func), do: reduce(tail, func.(head, value), func)
+end
+MyList.square([4, 5, 6])                # => [16, 25, 36]
+MyList.reduce([4, 5, 6], 1, &(&1 * &2)) # => 120
+########
+
+# <- book
