@@ -286,6 +286,15 @@ defmodule ModulePlayground do
   end
 end
 
+# sleep
+defmodule Countdown do
+  def sleep(seconds) do
+    receive do
+    after seconds * 1000 -> nil
+    end
+  end
+end
+
 defmodule ModulePlayground do
   import IO, only: [puts: 1]
   import Kernel, except: [inspect: 1] # because we override this method
@@ -684,6 +693,622 @@ defmodule MyList do
 end
 MyList.square([4, 5, 6])                # => [16, 25, 36]
 MyList.reduce([4, 5, 6], 1, &(&1 * &2)) # => 120
+########
+
+
+#### Inspect ####
+arr = [%{a: 4, b: "b"}, %{a: 6, b: "b"}]          # => [%{a: 4, b: "b"}, %{a: 6, b: "b"}]
+IO.inspect(for p = %{a: a} <- arr, a > 5, do: p ) # => [%{a: 6, b: "b"}]
+#
+IO.inspect(for p <- [5, 6, 7], p > 5, do: p) # => [6, 7]
+########
+
+
+#### pattern matching ####
+# match variables keys
+data = %{name: "Dave", state: "TX", likes: "Elixir"}
+
+for key <- [:name, :like] do
+  %{ ^key => value } = data
+  value
+end
+# => ["Dave", "Elixir"]
+########
+
+#### Updating a Map ####
+m  = %{a: 1, b: 2, c: 3}         # => %{a: 1, b: 2, c: 3}
+m1 = %{m | b: "two", c: "three"} # => %{a: 1, b: "two", c: "three"}
+m2 = %{m1 | a: "one"}            # => %{a: "one", b: "two", c: "three"}
+########
+
+#### Struct ####
+defmodule Subscriber do
+  defstruct name: "", paid: false, over_18: true
+end
+s1 = %Subscriber{}                         # => %Subscriber{name: "", paid: false, over_18: true}
+s2 = %Subscriber{name: "Dave"}             # => %Subscriber{name: "Dave", paid: false, over_18: true}
+s3 = %Subscriber{name: "Mary", paid: true} # => %Subscriber{name: "Mary", paid: true, over_18: true}
+s4 = %Subscriber{s3 | name: "Marie"}       # => %Subscriber{name: "Marie", paid: true, over_18: true}v
+
+s3.name # => "Mary"
+%Subscriber{name: a_name} = s3
+a_name # => "Mary"
+##
+defmodule Attendee do
+  defstruct name: "", paid: false, over_18: true
+
+  def may_attend_after_party(attendee = %Attendee{}), do: attendee.paid && attendee.over_18
+
+  def print_vip_badge(%Attendee{name: name}) when name != "", do: "Hello #{name}"
+  def print_vip_badge(_), do: IO.puts "missing name for badge"
+end
+a1 = %Attendee{name: "Dave", over_18: true}
+Attendee.may_attend_after_party(a1) # => false
+##
+defmodule Customer do
+  defstruct name: "", company: ""
+end
+defmodule BugReport do
+  defstruct owner: %Customer{}, details: "", severity: 1
+end
+owner = %Customer{company: "XXX", name: "YYY"}
+# => %Customer{company: "XXX", name: "YYY"}
+report = %BugReport{owner: owner}
+# => %BugReport{details: "", owner: %Customer{company: "XXX", name: "YYY"}, severity: 1}
+report = %BugReport{report | owner: %Customer{report.owner | company: "PragProg"}}
+# => %BugReport{details: "", owner: %Customer{company: "PragProg", name: "YYY"}, severity: 1}
+owner # => %BugReport{details: "", owner: %Customer{company: "XXX", name: "YYY"}, severity: 1}
+
+# add value
+put_in(report.owner.company, "PragProg")      # => %Customer{company: "PragProg", name: "Dave", severity: 1}
+
+# change value with nested function
+update_in(report.owner.name, &("Mr. " <> &1)) # => %BugReport{details: "", owner: %Customer{company: "XXX", name: "Mr. YYY"}, severity: 1}
+
+get_in
+nested = %{
+  buttercup: %{
+    actor: %{
+      first: "Robin",
+      last: "Wright"
+    },
+    role: "princess"
+  },
+  westley: %{
+    actor: %{
+      first: "Cary",
+      last: "Ewles"
+    },
+    role: "farm boy"
+  }
+}
+IO.inspect get_in(nested, [:buttercup])
+# => %{actor: %{first: "Robin", last: "Wright"}, role: "princess"}
+IO.inspect get_in(nested, [:buttercup, :actor]) # => %{first: "Robin", last: "Wright"}
+IO.inspect get_in(nested, [:buttercup, :actor, :first]) # => "Robin"
+IO.inspect put_in(nested, [:westley, :actor, :last], "Elwes")
+# => %{buttercup: %{actor: %{first: "Robin", last: "Wright"}, role: "princess"}
+# => westley: %{actor: %{first: "Cary", last: "Elwes"}, role: "farm boy"}}
+IO.inspect get_in(authors, [some_function, :some_arg])
+get_and_update_in
+########
+
+
+#### Access Module ####
+cast = [
+  %{
+    character: "Buttercup",
+    actor: %{
+      first: "Robin",
+      last: "Wright"
+    },
+    role: "princess"
+  },
+  %{
+    character: "Westley",
+    actor: %{
+      first: "Cary",
+      last: "Elwes"
+    },
+    role: "farm boy"
+  }
+]
+IO.inspect get_in(cast, [Access.all(), :character]) #=> ["Buttercup", "Westley"]
+IO.inspect get_in(cast, [Access.at(1), :role]) #=> "farm boy"
+IO.inspect get_and_update_in(
+             cast,
+             [Access.all(), :actor, :last],
+             fn (val) -> {val, String.upcase(val)} end
+           )
+IO.inspect get_in(cast, [Access.key(:westley), :actor, Access.elem(1)]) #=> "Elwes"
+Access.pop(%{name: "Elixir", creator: "Valim"}, :name) # => {"Elixir", %{creator: "Valim"}}
+Access.pop([name: "Elixir", creator: "Valim"], :name)  # => {"Elixir", [creator: "Valim"]}
+Access.pop(%{name: "Elixir", creator: "Valim"}, :year) # => {nil, %{creator: "Valim", name: "Elixir"}}
+########
+
+#### Sets ####
+set1 = 1..5 |> Enum.into(MapSet.new) # => #MapSet<[1, 2, 3, 4, 5]>
+set2 = 3..8 |> Enum.into(MapSet.new) # => #MapSet<[3, 4, 5, 6, 7, 8]>
+
+MapSet.member? set1, 3         # => true
+MapSet.union set1, set2        # => #MapSet<[1, 2, 3, 4, 5, 6, 7, 8]>
+MapSet.difference set1, set2   # => #MapSet<[1, 2]>
+MapSet.difference set2, set1   # => #MapSet<[6, 7, 8]>
+MapSet.intersection set2, set1 # => #MapSet<[3, 4, 5]>
+########
+
+#### Keyword ####
+options = [{:width, 72}, {:width, 454}] # => [width: 72, width: 454]
+Keyword.get_values(options, :width)     # => [72, 454]
+########
+
+#### Enum ####
+list = Enum.to_list 1..5 # => [1, 2, 3, 4, 5]
+
+# Concatenate collections:
+Enum.concat([1,2,3], [4,5,6]) # => [1, 2, 3, 4, 5, 6]
+Enum.concat [1,2,3], 'abc'    # => [1, 2, 3, 97, 98, 99]
+
+#Create collections whose elements are some function of the original:
+Enum.map(list, &(&1 * 10))                 # => [10, 20, 30, 40, 50]
+Enum.map(list, &String.duplicate("*", &1)) # => ["*", "**", "***", "****", "*****"]
+
+# Select elements by position or criteria:
+Enum.at(10..20, 3)                    # => 13
+Enum.at(10..20, 20)                   # => nil
+Enum.at(10..20, 20, :no_one_here)     # => :no_one_here
+Enum.filter(list, &(&1 > 2))          # => [3, 4, 5]
+require Integer                       # to get access to is_even nil
+Enum.filter(list, &Integer.is_even/1) # => [2, 4]
+Enum.reject(list, &Integer.is_even/1) # => [1, 3, 5]
+
+#Sort and compare elements:
+Enum.sort ["there", "was", "a", "crooked", "man"] # => ["a", "crooked", "man", "there", "was"]
+Enum.sort ["there", "was", "a", "crooked", "man"], &(String.length(&1) <= String.length(&2))
+# => ["a", "was", "man", "there", "crooked"]
+
+Enum.max ["there", "was", "a", "crooked", "man"]                      # => "was"
+Enum.max_by ["there", "was", "a", "crooked", "man"], &String.length/1 # => "crooked"
+
+# Split a collection:
+Enum.take(list, 3)                # => [1, 2, 3]
+Enum.take_every(list, 2 )         # => [1, 3, 5]
+Enum.split_while(list, &(&1 < 4)) # => {[1, 2, 3], [4, 5]}
+
+# Join a collection:
+Enum.join(list)       # => "12345"
+Enum.join(list, ", ") # => "1, 2, 3, 4, 5"
+
+# Predicate operations:
+Enum.all?(list, &(&1 < 4)) # => false
+Enum.any?(list, &(&1 < 4)) # => true
+Enum.member?(list, 4)      # => true
+Enum.empty?(list)          # => false
+
+# Merge collections:
+Enum.zip(list, [:a, :b, :c])                   # => [{1, :a}, {2, :b}, {3, :c}]
+Enum.with_index(["once", "upon", "a", "time"]) # => [{"once", 0}, {"upon", 1}, {"a", 2}, {"time", 3}]
+
+# Fold elements into a single value:
+Enum.reduce(1..100, &(&1 + &2)) # => 5050
+Enum.reduce(
+  ["now", "is", "the", "time"],
+  fn word, longest ->
+    if String.length(word) > String.length(longest) do
+      word
+    else
+      longest
+    end
+  end
+) # => "time"
+Enum.reduce(
+  ["now", "is", "the", "time"],
+  0,
+  fn word, longest ->
+    if String.length(word) > longest
+      do: String.length(word),
+      else: longest
+  end
+) # => 4
+# into
+Enum.into 1..5, []         # => [1, 2, 3, 4, 5]
+Enum.into 1..5, [100, 101] # => [100, 101, 1, 2, 3, 4, 5]
+########
+
+#### Streams ####
+[1, 2, 3, 4, 5]                                     # => [1, 2, 3, 4, 5]
+|> Enum.map(&(&1 * &1))                             # => [1, 4, 9, 16, 25]
+|> Enum.with_index                                  # => [{1, 0}, {4, 1}, {9, 2}, {16, 3}, {25, 4}]
+|> Enum.map(fn {value, index} -> value - index end) # => [1, 3, 7, 13, 21]
+|> IO.inspect                                       # => [1, 3, 7, 13, 21]
+##
+File.read!("/usr/share/dict/words")
+|> String.split
+|> Enum.max_by(&String.length/1)
+|> IO.puts
+##
+s = Stream.map(
+  [1, 3, 5, 7],
+  &(&1 + 1)
+) # => #Stream<[enum: [1, 3, 5, 7], funs: [#Function<46.3851/1 in Stream.map/2>]]>
+##
+s = Stream.map [1, 3, 5, 7], &(&1 + 1) # => #Stream<[enum: [1, 3, 5, 7], funs: [#Function<46.3851/1 in Stream.map/2>] ]>
+Enum.to_list s                         # => [2, 4, 6, 8]
+
+squares = Stream.map [1, 2, 3, 4], &(&1*&1)
+# => #Stream<[enum: [1, 2, 3, 4], funs: [#Function<32.133702391 in Stream.map/2>] ]>
+plus_ones = Stream.map squares, &(&1+1)
+# => #Stream<[enum: [1, 2, 3, 4], funs: [#Function<32.133702391 in Stream.map/2>,
+                                         #Function<32.133702391 in Stream.map/2>] ]>
+odds = Stream.filter plus_ones, fn x -> rem(x,2) == 1 end
+# => #Stream<[enum: [1, 2, 3, 4], funs: [#Function<26.133702391 in Stream.filter/2>,
+                                         #Function<32.133702391 in Stream.map/2>,
+                                         #Function<32.133702391 in Stream.map/2>] ]>
+Enum.to_list odds # => [5, 17]
+
+[1, 2, 3, 4]
+|> Stream.map(&(&1*&1))
+|> Stream.map(&(&1+1))
+|> Stream.filter(fn x -> rem(x,2) == 1 end)
+|> Enum.to_list
+
+File.open!("/usr/share/dict/words")
+|> IO.stream(:line)
+|> Enum.max_by(&String.length/1)
+|> IO.puts
+
+File.stream!("/usr/share/dict/words")
+|> Enum.max_by(&String.length/1)
+|> IO.puts
+
+Enum.map(1..10_000_000, &(&1+1))
+|> Enum.take(5)
+# => [2, 3, 4, 5, 6]
+
+Stream.map(1..10_000_000, &(&1+1))
+|> Enum.take(5)
+# => [2, 3, 4, 5, 6]
+
+Stream.cycle(~w{ green white })
+|> Stream.zip(1..5)
+|> Enum.map(
+     fn {class, value} ->
+       "<tr class='#{class}'><td>#{value}</td></tr>\n"
+     end
+   )
+|> IO.puts
+# <tr class="green"><td>1</td></tr>
+# <tr class="white"><td>2</td></tr>
+# <tr class="green"><td>3</td></tr>
+# <tr class="white"><td>4</td></tr>
+# <tr class="green"><td>5</td></tr>
+# :ok
+
+Stream.repeatedly(fn -> true end) |> Enum.take(3)     # => [true, true, true]
+Stream.repeatedly(&:random.uniform/0) |> Enum.take(3) # => [0.7230402056221108, 0.94581636451987, 0.5014907142064751]м
+# iterate
+Stream.iterate(0, &(&1+1))  |> Enum.take(5) # => [0, 1, 2, 3, 4]
+Stream.iterate(2, &(&1*&1)) |> Enum.take(5) # => [2, 4, 16, 256, 65536]
+Stream.iterate([], &[&1])   |> Enum.take(5) # => [[], [[]], [[[]]], [[[[]]]], [[[[[]]]]]]
+
+Stream.unfold({0,1}, fn {f1,f2} -> {f1, {f2, f1+f2}} end) |> Enum.take(15)
+# => [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377]
+
+Stream.resource fn -> File.open("sample") end,
+                fn file ->
+                  case IO.read(file, :line) do
+                    data when is_binary(data) -> {[data], file}
+                    _ -> {:halt, file}
+                  end
+                end,
+                fn file -> File.close(file) end
+########
+
+
+#### Comprehensions ####
+for x <- [1, 2, 3, 4, 5], do: x * x        # => [1, 4, 9, 16, 25]
+for x <- [1, 2, 3, 4, 5], x < 4, do: x * x # => [1, 4, 9]
+for x <- [1,2], y <- [5,6], do: {x, y}     # => [{1, 5}, {1, 6}, {2, 5}, {2, 6}]
+
+min_maxes = [{1,4}, {2,3}, {10, 15}]             # => [{1, 4}, {2, 3}, {10, 15}]
+for {min,max} <- min_maxes, n <- min..max, do: n # => [1, 2, 3, 4, 2, 3, 10, 11, 12, 13, 14, 15]
+
+first8 = [1, 2, 3, 4, 5, 6, 7, 8] # => [1, 2, 3, 4, 5, 6, 7, 8]
+for x <- first8,
+    y <- first8,
+    x >= y, rem(x * y, 10) == 0,
+    do: {x, y} # => [{5, 2}, {5, 4}, {6, 5}, {8, 5}]
+
+reports = [dallas: :hot, minneapolis: :cold, dc: :muggy, la: :smoggy]
+# => [dallas: :hot, minneapolis: :cold, dc: :muggy, la: :smoggy]
+for {city, weather} <- reports, do: {weather, city}
+# => [hot: :dallas, cold: :minneapolis, muggy: :dc, smoggy: :la]
+
+for << ch <- "hello" >>, do: ch     # => 'hello'
+for << ch <- "hello" >>, do: <<ch>> # => ["h", "e", "l", "l", "o"]
+
+for << << b1::size(2), b2::size(3), b3::size(3) >> <- "hello" >>, do: "0#{b1}#{b2}#{b3}"
+# => ["0150", "0145", "0154", "0154", "0157"]
+
+for x <- ~w{ cat dog }, into: %{}, do: {x, String.upcase(x)} # => %{"cat" => "CAT", "dog" => "DOG"}
+########
+
+
+#### Sigils ####
+# ~C A character list with no escaping or interpolation
+# ~c A character list, escaped and interpolated just like a single-quoted string ~D A Date in the format yyyy-mm-dd
+# ~N A naive (raw) DateTime in the format yyyy-mm-dd hh:mm:ss[.ddd]
+# ~R A regular expression with no escaping or interpolation
+# ~r A regular expression, escaped and interpolated
+# ~S A string with no escaping or interpolation
+# ~s A string, escaped and interpolated just like a double-quoted string
+# ~T A Time in the format hh:mm:ss[.dddd]
+# ~W A list of whitespace-delimited words, with no escaping or interpolation ~w A list of whitespace-delimited words, with escaping and interpolation
+~C[1\n2#{1+2}]                  # => '1\\n2\#{1+2}'
+~c"1\n2#{1+2}"                  # => '1\n23'
+~S[1\n2#{1+2}]                  # => "1\\n2\#{1+2}"
+~s/1\n2#{1+2}/                  # => "1\n23"
+~W[the c#{'a'}t sat on the mat] # => ["the", "c\#{'a'}t", "sat", "on", "the", "mat"]
+~w[the c#{'a'}t sat on the mat] # => ["the", "cat", "sat", "on", "the", "mat"]
+~D<1999-12-31>
+~D[1999-12-31]
+~T[12:34:56]
+~T[12:34:56]
+~N{1999-12-31 23:59:59}
+~N[1999-12-31 23:59:59]
+########
+
+
+#### String ####
+String.at("dog", 0)         # => "d"
+String.last("dog")          # => "g"
+String.length("dog")        # => 3
+String.codepoints("dog")    # => ["D", "o", "g"]
+String.dublicate("Ho! ", 3) # => "Ho! Ho! Ho!"
+
+String.capitalize("dog") # => "Dog"
+String.downcase("Dog")   # => "dog"
+String.upcase("Dog")     # => "DOG"
+
+String.start_with?("string", ["elix", "stri", "ring"]) # => true
+String.end_with?("string", ["elix", "stri", "ring"])   # => true
+String.printable?("\x00 a null")                       # => false
+String.valid? 1                                        # => false
+
+String.trim("\t SALE \r\n")             # => "SALE"
+String.trim("!!!SALE!!!", "!")          # => "SALE"
+String.trim_leading("!!!SALE!!!", "!")  # => "SALE!!!"
+String.trim_trailing("!!!SALE!!!", "!") # => "!!!SALE"
+
+String.replace "the cat on the mat", "at", "AT"                          # => "the cAT on the mAT"
+String.replace "the cat on the mat", "at", "AT", global: false           # => "the cAT on the mat"
+String.replace "the cat on the mat", "at", "AT", insert_replaced: 0      # => "the catAT on the matAT"
+String.replace "the cat on the mat", "at", "AT", insert_replaced: [0, 2] # => "the catATat on the matATat"
+########
+
+
+#### PRY ####
+require IEx; IEx.pry
+binding
+continue
+break! Buggy.decode/1
+breaks
+########
+
+
+#### Test ####
+defmodule TestStats1 do
+  use ExUnit.Case
+
+  describe "Stats on lists of ints" do
+    setup do
+      [
+        list: [1, 3, 5, 7, 9, 11],
+        sum: 36,
+        count: 6
+      ]
+    end
+
+    test "calculates sum", fixture do
+      assert Stats.sum(fixture.list) == fixture.sum
+    end
+
+    property "single element lists are their own sum" do
+      check all number <- integer() do
+        assert Stats.sum([number]) == number
+      end
+    end
+
+    property "sum equals average times count (min_length)" do
+      check all l <- list_of(integer(), min_length: 1) do
+        assert_in_delta(
+          Stats.sum(l),
+          Stats.count(l) * Stats.average(l),
+          1.0e-6
+        )
+      end
+    end
+  end
+
+  describe "Stats on lists of ints" do
+    setup do
+      {:ok, %{list: [1, 3, 5, 7, 9, 11], sum: 36, count: 6}}
+    end
+
+    test "calculates sum", %{list: list, sum: sum, count: count} do
+      assert Stats.sum(list) == sum
+    end
+  end
+end
+########
+
+
+#### Process ####
+defmodule SpawnBasic do
+  def greet do
+    IO.puts "Hello" end
+end
+
+spawn(SpawnBasic, :greet, [])
+##
+defmodule Spawn1 do
+  def greet do
+    receive do
+      {sender, msg} -> send sender, {:ok, "Hello, #{msg}"}
+    end
+  end
+end
+# here's a client
+pid = spawn(Spawn1, :greet, [])
+
+send pid, {self(), "World!"}
+receive do
+  {:ok, message} -> IO.puts message
+end # => Hello, World!
+
+# Handling Multiple Messages
+defmodule Spawn2 do
+  def greet do
+    receive do
+      {sender, msg} -> send sender, {:ok, "Hello, #{msg}"}
+    end
+  end
+end
+# here's a client
+pid = spawn(Spawn2, :greet, [])
+
+send pid, {self(), "World!"}
+receive do
+  {:ok, message} -> IO.puts message
+end
+
+send pid, {self(), "Kermit!"}
+receive do
+  {:ok, message} -> IO.puts message
+end
+
+c("spawn2.exs") # => Hello World!
+##
+defmodule Spawn3 do
+  def greet do
+    receive do
+      {sender, msg} -> send sender, {:ok, "Hello, #{msg}"}
+    end
+  end
+end
+# here's a client
+pid = spawn(Spawn3, :greet, [])
+
+send pid, {self(), "World!"}
+receive do
+  {:ok, message} -> IO.puts message
+end
+
+send pid, {self(), "Kermit!"}
+receive do
+  {:ok, message} -> IO.puts message
+after 500 ->
+  IO.puts "The greeter has gone away"
+end
+##
+defmodule Chain do
+  def counter(next_pid) do
+    receive do
+      n -> send next_pid, n + 1
+    end
+  end
+
+  def create_processes(n) do
+    code_to_run = fn (_, send_to) ->
+      spawn(Chain, :counter, [send_to])
+    end
+
+    last = Enum.reduce(1..n, self(), code_to_run)
+    send(last, 0) # start the count by sending a zero to the last process
+
+    receive do # and wait for the result to come back to us final_answer when is_integer(final_answer) ->
+      "Result is #{inspect(final_answer)}"
+    end
+  end
+
+  def run(n) do
+    :timer.tc(Chain, :create_processes, [n])
+    |> IO.inspect
+  end
+
+  def sad_function do
+    sleep 500
+    exit(:boom)
+  end
+end
+elixir -r tmp/xxx.ex -e "Chain.run(10)"
+########
+
+#### Scheduler ####
+defmodule FibSolver do
+  def fib(scheduler) do
+    send scheduler, {:ready, self()}
+    receive do
+      {:fib, n, client} ->
+        send client, {:answer, n, fib_calc(n), self()}
+        fib(scheduler)
+      {:shutdown} -> exit(:normal)
+    end
+  end
+
+  # very inefficient, deliberately
+  defp fib_calc(0), do: 0
+  defp fib_calc(1), do: 1
+  defp fib_calc(n), do: fib_calc(n - 1) + fib_calc(n - 2)
+end
+##
+defmodule Scheduler do
+  def run(num_processes, module, func, to_calculate) do
+    (1..num_processes)
+    |> Enum.map(fn (_) -> spawn(module, func, [self()]) end)
+    |> schedule_processes(to_calculate, [])
+  end
+
+  defp schedule_processes(processes, queue, results) do
+    receive do
+      {:ready, pid} when length(queue) > 0 ->
+        [next | tail] = queue
+        send pid, {:fib, next, self()}
+        schedule_processes(processes, tail, results)
+      {:ready, pid} ->
+        send pid, {:shutdown}
+        if length(processes) > 1 do
+          schedule_processes(List.delete(processes, pid), queue, results)
+        else
+          Enum.sort(results, fn {n1, _}, {n2, _} -> n1 <= n2 end)
+        end
+      {:answer, number, result, _pid} ->
+        schedule_processes(processes, queue, [{number, result} | results])
+    end
+  end
+end
+##
+to_process = List.duplicate(37, 20)
+
+Enum.each 1..10, fn num_processes ->
+  {time, result} = :timer.tc(
+    Scheduler,
+    :run,
+    [num_processes, FibSolver, :fib, to_process]
+  )
+
+  if num_processes == 1 do
+    IO.puts inspect result
+    IO.puts "\n # time (s)"
+  end
+
+  :io.format "~2B ~.2f~n",
+             [
+               num_processes,
+               time / 1000000.0
+             ]
+end
+
 ########
 
 # <- book
