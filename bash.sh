@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 sudo lsof -i tcp:5432
 sudo kill -9 60654
 ps aux | grep postgres

@@ -8,12 +8,77 @@ mix new rsvp --sup
 ##
 
 
+########
+# alias - allows shorter names
+# import - allows easy access to functions from other modules
+# use - similar to import but allows to inject code and gives modules authors
+########
+
 # ecto
-# console
-alias MyApp.Repo
-alias MyApp.Post
-Repo.all(Post)
-Repo.all(Ecto.Query.from p in Post, where: is_nil(p.inserted_at))
+# One-to-one
+user = %User{name: "John Doe", email: "john.doe@example.com"}
+user = Repo.insert!(user)
+
+avatar = %Avatar{nick_name: "Elixir", pic_url: "http://elixir-lang.org/images/logo.png"}
+user = %User{name: "John Doe", email: "john.doe@example.com", avatar: avatar}
+user = Repo.insert!(user)
+Repo.all(User) |> Repo.preload(:avatar)
+
+# One-to-many
+post = Ecto.build_assoc(user, :posts, %{header: "Clickbait header", body: "No real content"})
+Repo.insert!(post)
+
+post = Ecto.build_assoc(user, :posts, %{header: "5 ways to improve your Ecto", body: "Add url of this tutorial"})
+Repo.insert!(post)
+
+Repo.get(User, user.id) |> Repo.preload(:posts)
+
+# Many-to-many
+clickbait_tag = Repo.insert! %Tag{name: "clickbait"}
+misc_tag = Repo.insert! %Tag{name: "misc"}
+ecto_tag = Repo.insert! %Tag{name: "ecto"}
+post = %Post{header: "Clickbait header", body: "No real content"}
+post = Repo.insert!(post)
+
+post_changeset = Ecto.Changeset.change(post)
+post_with_tags = Ecto.Changeset.put_assoc(post_changeset, :tags, [clickbait_tag, misc_tag])
+post = Repo.update!(post_with_tags)
+
+post = Repo.get(Post, post.id) |> Repo.preload(:tags)
+tag = Repo.get(Tag, 1) |> Repo.preload(:posts)
+
+post_changeset = Ecto.Changeset.change(post)
+post_with_tags = Ecto.Changeset.put_assoc(post_changeset, :tags, [misc_tag])
+
+post = Repo.update!(post_with_tags)
+##
+
+alias App.Repo
+alias App.Tag
+alias App.Operation
+alias App.OperationQuery
+alias App.OperationTag
+{:ok, tag} = Repo.insert %Tag{title: "shit"}
+
+Repo.all(Tag)
+tag = Repo.one(Tag)
+tag = Repo.preload(tag, :operations)
+
+Repo.all(Ecto.Query.from p in Tag, where: is_nil(p.inserted_at))
+
+{:ok, tag}     = Repo.insert %Tag{title: "test"}
+{:ok, operation_tag} = Repo.insert %OperationTag{tag_id: tag.id, operation_id: "e10bc018-d3fd-44cc-9de3-4195f8661760"}
+
+operation = OperationQuery.find("946d6c54-f078-4698-87e7-83f57769478d")
+operation |> Operation.changeset(%Operation{tags: [tag]})
+operation |> Operation.changeset(%Operation{tags: [%Tag{title: "test1"}]})
+
+Changeset.put_assoc(operation, :tags, [tag])
+
+Repo.preload(operation_tag, :tag)
+
+x = App.Tag.changeset(%App.Tag{}, %{title: "shit"})
+x.valid?
 
 from(
   user in Client,
@@ -31,6 +96,7 @@ from(
 )
 # sandbox
 Ecto.Adapters.SQL.Sandbox.mode(Repo, :auto)
+Ecto.Adapters.SQL.Sandbox.checkout(App.Repo)
 # migrations
 mix ecto.gen.migration add_events_table
 # insert

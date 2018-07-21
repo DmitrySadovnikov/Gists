@@ -1308,7 +1308,261 @@ Enum.each 1..10, fn num_processes ->
                time / 1000000.0
              ]
 end
+########
 
+
+#### Node ####
+iex --sname one
+iex --sname two
+
+Node.list
+Node.connect(:"one@light-boy")
+func = fn -> IO.inspect Node.self end
+Node.spawn(:"one@light-boy", func)
+
+iex --sname one --cookie chocolate-chip
+Node.get_cookie # => :"chocolate-chip"
+########
+
+
+#### GenServer ####
+defmodule Sequence.Server do
+  use GenServer
+
+  def init(initial_number) do
+    {:ok, initial_number}
+  end
+
+  def handle_call(:next_number, _from, current_number) do
+    {:reply, current_number, current_number + 1}
+  end
+
+  def handle_call({:set_number, new_number}, _from, _current_number) do
+    { :reply, new_number, new_number }
+  end
+
+  def handle_call({:factors, number}, _, _) do
+    { :reply, { :factors_of, number, factors(number)}, [] }
+  end
+end
+
+# iex -S mix
+
+{:ok, pid} = GenServer.start_link(Sequence.Server, 100) # => {:ok, #PID<0.71.0>}
+GenServer.call(pid, :next_number)       # => 100
+GenServer.call(pid, :next_number)       # => 101
+GenServer.call(pid, {:set_number, 999}) # => 999
+
+{ :ok, pid } = GenServer.start_link(Sequence.Server, 100, name: :seq)
+GenServer.call(:seq, :next_number) # => 100
+:sys.get_status :seq
+# => {:status, #PID<0.69.0>, {:module, :gen_server}, [["$ancestors": [#PID<0.58.0>], "$initial_call": {Sequence.Server, :init, 1}], :running, #PID<0.58.0>, [], [header: 'Status for generic server seq', data: [{'Status', :running}, {'Parent', #PID<0.58.0>}, {'Logged events', []}], data: [{'State', "My current state is '102', and I'm happy"}]]]}
+########
+
+
+#### GenServer Callbacks ####
+# init(start_arguments)                   - Called by GenServer when starting a new server
+# handle_call(request, from, state)       - Invoked when a client uses GenServer.call(pid, request)
+# handle_cast(request, state)             - Called in response to GenServer.cast(pid, request)
+# handle_info(info, state)                - Called to handle incoming messages that are not call or cast requests
+# terminate(reason, state)                - Called when the server is about to be terminated
+# code_change(from_version, state, extra) - OTP lets us replace a running server without stopping the system
+# format_status(reason, [pdict, state])   - Used to customize the state display of the server
+
+# call and cast:
+# { :noreply, new_state [ , :hibernate | timeout ] }
+# { :stop, reason, new_state } # => Signal that the server is to terminate.
+# handle_call:
+# { :reply, response, new_state [ , :hibernate | timeout ] } # => Send response to the client
+# { :stop, reason, reply, new_state } # => Send the response and signal that the server is to terminate
+#########
+
+
+#### Interface ####
+defmodule Sequence.Server do
+  use GenServer
+  #####
+  # External API
+  def start_link(current_number) do
+    GenServer.start_link(__MODULE__, current_number, name: __MODULE__)
+  end
+
+  def next_number do
+    GenServer.call __MODULE__, :next_number
+  end
+
+  def increment_number(delta) do
+    GenServer.cast __MODULE__, {:increment_number, delta}
+  end
+  #####
+  # GenServer implementation
+  def init(initial_number) do
+    {:ok, initial_number}
+  end
+
+  def handle_call(:next_number, _from, current_number) do
+    {:reply, current_number, current_number+1}
+  end
+
+  def handle_cast({:increment_number, delta}, current_number) do
+    {:noreply, current_number + delta}
+  end
+
+  def format_status(_reason, [_pdict, state]) do
+    [data: [{'State', "My current state is '#{inspect state}', and I'm happy"}]]
+  end
+end
+########
+
+
+#### Supervision ####
+# Tree Strategies:
+:one_for_one        # If one of the workers dies, then restart it
+:one_for_all        # If one dies, supervisor kills the rest and then restart all
+:rest_for_one       # If one dies, supervisor kills the rest in start order of these processes and then restart all killed workers
+:simple_one_for_one # Same as :one_for_one. But it needs to implement Supervision.Spec and you need to specify only one entry in child specification. That means every child spawned from this supervisor is the same kind of a process.
+########
+
+
+#### Worker Restart Options ####
+:permanent # this worker should always be running—it is permanent. This means that the supervision strategy will be applied whenever this worker terminates, for whatever reason.
+:temporary # this worker should never be restarted, so the supervision strategy is never applied if this worker dies.
+:transient # it is expected that this worker will at some point terminate normally and this terminate should not result in a restart. However, should this worker die abnormally, then it should be restarted by running the supervision strategy.
+
+defmodule Convolver do
+  use GenServer, restart: :transient
+end
+########
+
+#### Server kinds ####
+# The Results.    This is the most important server, as it holds the results of the scanning in memory. We need it to be reliable, so we won’t put much code in it.
+# The PathFinder. This is responsible for returning the paths to each file in the directory tree, one at a time.
+# The Worker.     This asks the PathFinder for a path, calculates the hash of the resulting file’s contents, and passes the result to the gatherer.
+# The Gatherer    This is the server that both starts the ball rolling and that determines when things have completed. When they do, it fetches the results and reports on them.
+########
+
+#### The Duper Application ####
+mix new --sup duper
+cd duper
+git init
+git add .
+git commit -a -m 'raw application'
+
+# The Results Server
+#duper/1/duper/lib/duper/results.ex
+defmodule Duper.Results do
+  use GenServer
+  @me __MODULE__
+  # API
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, :no_args, name: @me)
+  end
+  def add_hash_for(path, hash) do
+    GenServer.cast(@me, {:add, path, hash})
+  end
+  def find_duplicates() do
+    GenServer.call(@me, :find_duplicates)
+  end
+  # Server
+  def init(:no_args) do
+    {:ok, %{}}
+  end
+  def handle_cast({:add, path, hash}, results) do
+    results =
+      Map.update(
+        results,
+        hash,
+        [path],
+        fn existing ->
+          # look in this map
+          # for an entry with key
+          # if not found, store this value
+          # else update with result of this fn
+          [path | existing]
+        end
+      )
+    {:noreply, results} end
+  def handle_call(:find_duplicates, _from, results) do
+    {
+      :reply,
+      hashes_with_more_than_one_path(results),
+      results
+    }
+  end
+  defp hashes_with_more_than_one_path(results) do
+    results
+    |> Enum.filter(fn {_hash, paths} -> length(paths) > 1 end)
+    |> Enum.map(&elem(&1, 1))
+  end
+end
+
+#duper/1/duper/test/duper/results_test.exs
+defmodule Duper.ResultsTest do
+  use ExUnit.Case
+  alias Duper.Results
+
+  test "can add entries to the results" do
+    Results.add_hash_for("path1", 123)
+    Results.add_hash_for("path2", 456)
+    Results.add_hash_for("path3", 123)
+    Results.add_hash_for("path4", 789)
+    Results.add_hash_for("path5", 456)
+    Results.add_hash_for("path6", 999)
+    duplicates = Results.find_duplicates()
+    assert length(duplicates) == 2
+    assert ~w{path3 path1} in duplicates
+    assert ~w{path5 path2} in duplicates
+  end
+end
+
+# The PathFinder Server
+#duper/1/duper/mix.exs
+defp deps do
+  [
+    dir_walker: "~> 0.0.7",
+  ]
+end
+
+# duper/1/duper/lib/duper/path_finder.ex
+defmodule Duper.PathFinder do
+  use GenServer
+  @me PathFinder
+  def start_link(root) do
+    GenServer.start_link(__MODULE__, root, name: @me)
+  end
+  def next_path() do
+    GenServer.call(@me, :next_path)
+  end
+  def init(path) do
+    DirWalker.start_link(path)
+  end
+  def handle_call(:next_path, _from, dir_walker) do
+    path = case DirWalker.next(dir_walker) do
+      [path] -> path
+      other -> other
+    end
+    {:reply, path, dir_walker} end
+end
+
+########
+
+
+#### Agent ####
+# Agents are a simple abstraction around state.
+{:ok, count} = Agent.start(fn -> 0 end) # => { :ok, #PID<0.69.0>}
+Agent.get(count, &(&1))                 # => 0
+Agent.update(count, &(&1 + 1))          # => :ok
+Agent.get(count, &(&1))                 # => :1
+########
+
+
+#### Behaviors ####
+# Behaviours in Elixir (and Erlang) are a way to separate and abstract the generic
+# part of a component (which becomes the behaviour module) from the specific part
+# (which becomes the callback module).
+########
+
+#### Protocol ####
 ########
 
 # <- book

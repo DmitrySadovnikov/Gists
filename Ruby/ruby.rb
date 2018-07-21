@@ -1,3 +1,22 @@
+class Xxx
+  class << self
+    def self.xxx(a)
+      puts a
+    end
+
+    xxx(:xxx)
+  end
+end
+# puts xxx after init
+
+x = {
+    1 => -> (x) { x * 2 },
+    2 => -> (x) { x * 3 },
+}[2].(2)
+
+puts x
+
+
 require 'file_name' # includes file
 include ModuleName  # includes instance methods
 extend  ModuleName  # includes class methods
