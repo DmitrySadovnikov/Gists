@@ -16,6 +16,17 @@ x = {
 
 puts x
 
+a, (b, *c), d = 1, [2, 3, 4], 5
+# a => 1
+# b => 2
+# c => [3, 4]
+# d => 5
+
+a, (b, c), d = 1, [2, 3, 4], 5
+# a => 1
+# b => 2
+# c => 3
+# d => 5
 
 require 'file_name' # includes file
 include ModuleName  # includes instance methods
@@ -570,8 +581,8 @@ puts doub { 2 * 2 } # вызываешь метод и передаешь туд
 ###############################
 # Отличия лямбды от прока
 def meth
-  la =   -> { return 10 }   # return возвращает из лямбды в метод
-  pr = proc { return 20 } # return возвращает из метода
+  la =   -> { return 10 }.call # return возвращает из лямбды в метод
+  pr = proc { return 20 }.call # return возвращает из метода
   return 1 + 2 # не выполняется из-за proc's return
 end
 

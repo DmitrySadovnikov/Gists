@@ -1,3 +1,10 @@
+--The HAVING clause was added to SQL because the WHERE keyword could not be used with aggregate functions.
+-- Отсеивает результат после группировки
+SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country
+HAVING COUNT(CustomerID) > 5;
+
 -- ILIKE - case-insensitive search */
 SELECT title from orders WHERE title ILIKE '%батарея%' LIMIT 10
 --------------------
