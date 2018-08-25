@@ -517,6 +517,9 @@ end
 Hobby.pluck :name # => ["Music", "Programming"]
 Hobby.unscoped.pluck :name # => ["Programming", "Music"]
 ##########
+scope :scheduler, default: true, &:scheduler
+scope :for_user, -> (user_id) { where('user_ids @> ARRAY[:user_id]::integer[]', user_id: user_id) }
+##########
 class Person < ActiveRecord::Base
   scope :active,         -> { where(state: 'active') }
   scope :ordered_by_age, -> { order(age: :desc) }
