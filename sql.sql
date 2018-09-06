@@ -1,3 +1,7 @@
+-- Cast
+SELECT (data ->> 'start_date')::date from requests
+SELECT to_date((data ->> 'start_date'), 'YYYY-MM-DD') from requests
+
 --The HAVING clause was added to SQL because the WHERE keyword could not be used with aggregate functions.
 -- Отсеивает результат после группировки
 SELECT COUNT(CustomerID), Country
