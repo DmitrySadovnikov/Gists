@@ -1,3 +1,27 @@
+###### Indexe
+disable_ddl_transaction! # disable transaction around migration
+
+add_index :users,
+          :setting_id,
+          algorithm: :concurrently # without locking a table for preventing downtime
+
+add_index :users,
+          :email,
+          name:  'index_on_email',
+          using: :btree # index type
+
+add_index :users,
+          :data, # json, text, array
+          using: :gin
+
+###### Index Types
+# B-Tree                                 - creates a tree that will keep itself balanced and even. Default. Accelerates search
+# Generalized Inverted Index (GIN)       - for columns with multiple values (hStore, Arrays, Range types, JSONB)
+# Generalized Inverted Seach Tree (GiST) - for rows that overlap values (Geometry types, Text when dealing with full-text search)
+# Space partitioned GiST (SP-GiST)       - for larger data (when your data has a natural clustering element) eg phone number 7 -> 916 -> 1111111
+# Block Range Indexes (BRIN)             - (non tree) for larger data (when there is some natural ordering to the data, and the data tends to be very large), eg similar zip codes of city are located near each other on disk
+# Hash                                   - for equality operations, and generally B-Tree still what you want here
+
 ###### params
 'ids[]'  = 1
 'ids[]'  = 2

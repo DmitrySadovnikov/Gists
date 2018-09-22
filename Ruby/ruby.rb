@@ -1,3 +1,5 @@
+a, (b, *c), d = 1, [2, 3, 4], 5 # => [1, [2, 3, 4], 5]
+
 class Xxx
   class << self
     def self.xxx(a)
@@ -32,6 +34,44 @@ require 'file_name' # includes file
 include ModuleName  # includes instance methods
 extend  ModuleName  # includes class methods
 prepend ModuleName  # includes methods above instance methods
+
+##########
+module B
+  def call
+    puts 2
+  end
+end
+
+class A
+  extend B
+
+  def self.call
+    puts 1
+  end
+end
+
+A.call # => 1
+
+module B
+  def self.included(base)
+    base.instance_eval do
+      def call
+        puts 2
+      end
+    end
+  end
+end
+
+class A
+  def self.call
+    puts 1
+  end
+
+  include B
+end
+
+A.call # => 2
+##########
 
 # comment annotation
 # TODO:
