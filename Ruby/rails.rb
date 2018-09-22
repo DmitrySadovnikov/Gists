@@ -46,6 +46,8 @@ Order.select("id, json_data #> '{state_history, -1}' -> 'changed_at' as foo").ma
 Order.where("json_data #> '{state_history, 0}' ->> 'from_state' = 's_assessing' ")
 Order.where("json_data ->> 'max_limit' LIKE ?", '10_000')
 
+# convert to date
+Order.where("(data ->> 'date')::date = ?", Date.current)
 ###############
 
 User.where('name SIMILAR TO ?', '(va|gi|na)%')
