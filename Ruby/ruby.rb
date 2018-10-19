@@ -221,8 +221,6 @@ class C < BaseClass 'string'
 end
 ######
 
-## Hash
-##############################
 # tap - принимает на вход себя и изменяет
 hash = {
   id:   1,
@@ -231,7 +229,12 @@ hash = {
 }
 hash.tap { |el| el[:name].capitalize!; el[:sex] = 'male' }
 # => {:id=>1, :name=>"Dima", :age=>26, :sex=>"male"}
-######
+
+# yield_self
+2.yield_self { |num| num * 2 } # => 4
+
+## Hash
+##############################
 hash = { marko: 'polo' }
 hash.fetch(:marko)        # => 'polo'
 hash.fetch(:marko, false) # если hash[:marko] == nil, то вернется false

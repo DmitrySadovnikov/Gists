@@ -1,3 +1,5 @@
+# rails new my_app --api --database=postgresql --skip-action-cable --skip-git --skip-javascript --skip-action-mailer --skip-active-record --skip-puma --skip-sprockets --skip-test
+
 ###### Indexe
 disable_ddl_transaction! # disable transaction around migration
 
