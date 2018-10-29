@@ -286,6 +286,23 @@ mario = spy('Mario')
 Game.play(mario)
 # <Double 'Mario'>
 expect(mario).to have_received(:jump)
-
-
 #######
+
+# satisfaction
+expect(1).to satisfy { |number| number.odd? }
+
+##
+expect([1, 2]).to include(*[1, 2])
+
+x = 5
+expect { x += 10 }.to change { x }.from(a_value_between(2, 7)).to(a_value_between(12, 17))
+
+# yield_control
+expect { |block_checker| just_yield(&block_checker) }.to yield_control
+expect { |block| 2.times(&block) }.to yield_control.at_most(4).times
+
+# yield_with_args and yield_with_no_args
+def self.just_yield_these(*args)
+  yield(args)
+end
+expect { |block| just_yield_these(1, 'food', Math::PI, &block) }.to yield_with_args(1, /foo/, a_value_within(0.1).of(3.14))
