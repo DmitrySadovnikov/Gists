@@ -1,3 +1,192 @@
+int8  (-128 to 127)
+int16 (-32768 to 32767)
+int32 (-2147483648 to 2147483647)
+int64 (-9223372036854775808 to 9223372036854775807)
+
+//// Pointer
+var message string = "Hello"
+var greeting *string = &message
+*greeting = "Hi"
+fmt.Println(message, *greeting) // => Hi Hi
+////
+
+//// iota
+const (
+    A = iota
+    B = iota
+    C = iota
+)
+
+fmt.Println(A, B, C) // => 0, 1, 2
+
+const (
+  A = iota
+  B
+  C
+)
+
+fmt.Println(A, B, C) // => 0, 1, 2
+////
+
+
+//// slice
+func CreateMessage(name string, greeting ...string) (message string, alternate string) {
+    message = greeting[1] + " " + name
+    alternate = "HEY! " + name
+    return
+}
+////
+
+//// closures
+type Printer func(string) ()
+
+func CreatePrintFunction(custom string) Printer {
+    return func(s string) {
+        fmt.Println(s + custom)
+    }
+}
+
+func Greet(s Salutation, do Printer) {
+    msg, alter := CreateMessage(s.name, s.greeting, "yo")
+    do(msg)
+    do(alter)
+}
+
+func main() {
+    var s = Salutation("Bob", "Hello")
+    Greet(s, CreatePrintFunction("!!!"))
+}
+////
+
+//// if
+isFormal := true
+
+if prefix := "Mr "; isFormal {
+  do(prefix + msg)
+}
+
+// ok idiom
+func (s *stack) Pop() (int, bool) {
+    if ... {
+        return 0, false
+    }
+
+    return v, true
+}
+
+s := &stack{}
+
+if v, ok := s.Pop(); ok {
+}
+////
+
+//// switch case
+func TypeSwitchTest(x inerface{}) {
+    switch x.(type) {
+        case int: fmt.Println("int")
+        case string: fmt.Println("string")
+        case Salutation: fmt.Println("salutation")
+        default: fmt.Println("unknown")
+    }
+}
+////
+
+//// loop
+i := 0
+
+for {
+    if i >= times {
+        break
+    }
+
+    if i % 2 == 0 {
+        i++
+        continue
+    }
+
+    i++
+}
+//
+for i := 0; i < 10; i++ {
+
+}
+////
+
+//// Ranges
+type Salutation struct {
+    Name string
+    Greeting string
+}
+
+var slice = greeting.Salutation("Bob", "Hello")
+slice := []greeting.Salutation {
+        {"Bob", "Hello"}
+        {"Joe", "Hi"}
+        {"Mary", "What's up?"}
+}
+
+slice[1:2] // {"Joe", "Hi"}
+slice = append(slice, slice...) // duplicate all slice
+////
+
+//// Map
+var prefixMap map[string]string
+prefixMap = make(map[string]string)
+
+prefixMap["Bob"] = "Mr "
+prefixMap["Joe"] = "Dr "
+prefixMap["Amy"] = "Dr "
+prefixMap["Mary"] = "Mrs "
+//
+prefixMap := map[string]string {
+    "Bob" : "Mr ",
+    "Joe" : "Dr ",
+    "Amy" : "Dr ",
+    "Mary" : "Mrs "
+}
+prefixMap["Joe"] = "Jr "
+delete(prefixMap, "Mary")
+////
+
+//// Type methods
+type Salutation struct {
+  Name string
+  Greeting string
+}
+
+type Salutations []Salutation
+
+func (salutations Salutations) Greet(do Printer, isFormal bool, times int) {
+  for _, s := range salutations {
+    msg, alter := CreateMessage(s.name, s.greeting, "yo")
+  }
+}
+
+func (salutation *Salutation) Rename(newName string) {
+    salutation.Name = newName
+}
+
+func main() {
+    s := Salutation { "Bob", "Hello" }
+    s.Rename("Joe")
+}
+////
+
+//// Interface
+type Renamable interface {
+    Rename(newName string)
+}
+
+func RenameToFrog(r greeting.Renamable) {
+    r.Rename("Frog")
+}
+
+func main() {
+  s := Salutation { "Bob", "Hello" }
+  RenameToFrog(&s)
+}
+////
+
 package main
 
 import (
